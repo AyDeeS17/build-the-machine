@@ -1,0 +1,26 @@
+name: Fix site initialization
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix DOM references
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          s=s.replace("cal.value=old.cal||'';pro.value=old.pro||'';carb.value=old.carb||'';fat.value=old.fat||'';meals.value=old.meals||'';items.value=old.items||'';", "document.getElementById('cal').value=old.cal||'';document.getElementById('pro').value=old.pro||'';document.getElementById('carb').value=old.carb||'';document.getElementById('fat').value=old.fat||'';document.getElementById('meals').value=old.meals||'';document.getElementById('items').value=old.items||'';")
+          p.write_text(s)
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || (git commit -m "Fix website initialization" && git push)
