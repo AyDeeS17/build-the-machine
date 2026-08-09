@@ -1,0 +1,73 @@
+name: Build The Machine branding and navigation
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply branding and navigation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          # Add favicon/PWA manifest once.
+          marker='<title>Build The Machine</title>'
+          addition='<link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="manifest" href="./manifest.webmanifest">'
+          if addition not in s and marker in s:
+              s=s.replace(marker, marker+addition, 1)
+          # Replace the simple navigation with the full navigation system.
+          old='<div class="nav"><button class="btn active" id="trainingBtn">TRAINING</button><button class="btn" id="foodBtn">FOOD / NUTRITION</button></div>'
+          new='''<div class="nav btm-nav"><button class="btn active" id="trainingBtn"><span class="nav-icon">▮▮</span> TRAINING</button><button class="btn" id="foodBtn"><span class="nav-icon">●</span> FOOD / NUTRITION</button><button class="btn" id="runningBtn"><span class="nav-icon">↗</span> RUNNING</button><button class="btn" id="sleepBtn"><span class="nav-icon">◐</span> SLEEP</button><button class="btn" id="progressBtn"><span class="nav-icon">▂▅▇</span> PROGRESS</button></div>'''
+          if old in s:
+              s=s.replace(old,new,1)
+          # Add a compact reset button to the week selector.
+          target='<div id="weekGrid" class="week-grid"></div>'
+          replacement='<div class="week-toolbar"><div id="weekGrid" class="week-grid"></div><button class="reset-week" id="resetWeekBtn">ERASE WEEK '+"'+'+"+""+'"</button></div>'
+          if target in s and 'id="resetWeekBtn"' not in s:
+              s=s.replace(target,replacement,1)
+          # Add CSS before the existing media query.
+          css='''
+          .btm-nav{width:100%;max-width:760px;flex-wrap:wrap}.btm-nav .btn{display:flex;align-items:center;justify-content:center;gap:7px}.nav-icon{font-weight:900;color:var(--blue);font-size:12px}.week-toolbar{position:relative}.reset-week{position:absolute;right:0;top:0;cursor:pointer;color:#b9c8d0;background:#0b151c;border:1px solid var(--line);border-radius:5px;padding:8px 11px;font:9px 'JetBrains Mono';font-weight:700}.day{margin:28px 0 42px}.day-head{padding:20px 18px;min-height:68px;border-radius:9px 9px 0 0;background:linear-gradient(135deg,#162b37,#10202a);border-color:#3b6073;box-shadow:0 8px 22px rgba(0,0,0,.16)}.day-head strong{font-size:14px;letter-spacing:.08em;color:#e8f0f4}.day-head span{font-size:10px}.day:after{content:'';display:block;height:1px;margin-top:42px;background:linear-gradient(90deg,transparent,#294656,transparent)}
+          @media(max-width:800px){.btm-nav{display:grid;grid-template-columns:repeat(3,1fr);width:100%}.reset-week{position:static;margin:10px 0 0}.day{margin:24px 0 34px}.day-head{min-height:74px}.week-toolbar{display:flex;flex-direction:column}}
+          @media(max-width:500px){.btm-nav{grid-template-columns:repeat(2,1fr)}.btm-nav .btn:last-child{grid-column:1/-1}.day{margin:22px 0 30px}.day-head{padding:18px 14px}.day-head strong{font-size:12px}}
+          '''
+          if '.btm-nav{' not in s and '</style>' in s:
+              s=s.replace('</style>',css+'</style>',1)
+          # Add a simple in-page navigation message for future modules without a legacy/back button.
+          marker2='<section id="trainingView">'
+          modules='''<section id="moduleView" class="panel module-view" style="display:none"><div class="ey" id="moduleEy">MODULE</div><h2 id="moduleTitle">COMING NEXT</h2><p class="note" id="moduleNote">This section is being integrated into the same Build The Machine dashboard. No separate old version is used.</p></section>'''
+          if 'id="moduleView"' not in s and marker2 in s:
+              s=s.replace(marker2,modules+marker2,1)
+          # Append robust navigation/reset wiring before the final IIFE closes.
+          hook='''
+          const moduleView=document.getElementById('moduleView');
+          const trainingView=document.getElementById('trainingView');
+          const foodView=document.getElementById('foodView');
+          const navButtons=[trainingBtn,foodBtn,runningBtn,sleepBtn,progressBtn];
+          function selectNav(active){navButtons.forEach(b=>b&&b.classList.remove('active'));if(active)active.classList.add('active')}
+          function showModule(title,note,btn){if(trainingView)trainingView.style.display='none';if(foodView)foodView.classList.remove('show');if(moduleView){moduleView.style.display='block';moduleTitle.textContent=title;moduleNote.textContent=note;}selectNav(btn)}
+          if(runningBtn)runningBtn.onclick=()=>showModule('RUNNING','Running tracking is being integrated here: 3 runs per week, starting at 5 KM and increasing 10% each week, with distance, pace and weekly analytics.',runningBtn);
+          if(sleepBtn)sleepBtn.onclick=()=>showModule('SLEEP','Sleep tracking is being integrated here with bedtime, wake time, duration, schedule scoring and weekly trends.',sleepBtn);
+          if(progressBtn)progressBtn.onclick=()=>showModule('OVERALL PROGRESS','This dashboard will combine training, running, nutrition and sleep into one 12-week progression score.',progressBtn);
+          if(trainingBtn)trainingBtn.onclick=()=>{moduleView.style.display='none';trainingView.style.display='block';selectNav(trainingBtn)};
+          if(foodBtn)foodBtn.onclick=()=>{moduleView.style.display='none';trainingView.style.display='none';foodView.classList.add('show');selectNav(foodBtn)};
+          if(resetWeekBtn)resetWeekBtn.onclick=()=>{if(confirm('Erase ALL training progression for Week '+week+'? This cannot be undone.')){Object.keys(state).filter(k=>k.startsWith(week+'|')).forEach(k=>delete state[k]);save();renderWeeks();renderWorkouts();resetWeekBtn.textContent='ERASE WEEK '+week;}};
+          function syncResetLabel(){if(resetWeekBtn)resetWeekBtn.textContent='ERASE WEEK '+week}
+          const oldRenderWeeks=renderWeeks; renderWeeks=function(){oldRenderWeeks();syncResetLabel()};
+          '''
+          if 'const moduleView=document.getElementById' not in s:
+              # insert immediately before the final })();
+              s=s.replace('})();',hook+'})();',1)
+          p.write_text(s)
+          PY
+      - name: Commit patched site
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || (git commit -m "Add Build The Machine navigation and branding" && git push)
