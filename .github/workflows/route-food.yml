@@ -1,0 +1,27 @@
+name: Route nutrition button
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  route:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Route nutrition button to full dashboard
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old="$('trainingBtn').onclick=showTraining;$('foodBtn').onclick=showFood;"
+          new="$('trainingBtn').onclick=showTraining;$('foodBtn').onclick=()=>{location.href='food.html'};"
+          if old in s:
+              s=s.replace(old,new)
+          p.write_text(s)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || (git commit -m "Route nutrition dashboard" && git push)
