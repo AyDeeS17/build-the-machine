@@ -1,0 +1,11 @@
+/* Final UI polish, visual-only, no layout changes. */
+:root{--btm-hover:#66b9df}
+.btm-nav .btn,.btm-week-grid .week,.btm-day-grid .day,.btm-target,.btm-kpi,.btm-rules-grid article,.save,.btm-reset-order{transition:background-color .22s ease,border-color .22s ease,color .22s ease,box-shadow .25s ease,opacity .22s ease,transform .18s cubic-bezier(.2,.8,.2,1)!important}
+.btm-nav .btn:hover,.btm-week-grid .week:hover,.btm-day-grid .day:hover,.btm-target:hover,.btm-kpi:hover,.btm-rules-grid article:hover,.save:hover,.btm-reset-order:hover{border-color:rgba(102,185,223,.58)!important;box-shadow:0 0 0 1px rgba(102,185,223,.10),0 0 18px rgba(102,185,223,.11),inset 0 1px 0 rgba(255,255,255,.025);transform:translateY(-1px)!important}
+.btm-nav .btn:active,.btm-week-grid .week:active,.btm-day-grid .day:active,.save:active,.btm-reset-order:active{transform:translateY(0) scale(.985)!important;transition-duration:.08s!important}
+.btm-week-grid .week.active,.btm-day-grid .day.active{box-shadow:0 0 0 1px rgba(102,185,223,.12),0 0 20px rgba(102,185,223,.11),inset 0 1px 0 rgba(255,255,255,.035)}
+.btm-day-grid .day.complete{box-shadow:inset 0 0 18px rgba(79,174,159,.035)}
+.btm-day-grid .day.complete:hover{border-color:rgba(79,174,159,.85)!important;box-shadow:0 0 0 1px rgba(79,174,159,.12),0 0 18px rgba(79,174,159,.10),inset 0 1px 0 rgba(255,255,255,.025)}
+.btm-reset-order{cursor:pointer!important;border-color:rgba(190,95,95,.48)!important;color:#d9a0a0!important;background:rgba(70,28,32,.35)!important}.btm-reset-order:hover{border-color:rgba(210,105,105,.75)!important;box-shadow:0 0 0 1px rgba(210,105,105,.10),0 0 18px rgba(210,105,105,.10),inset 0 1px 0 rgba(255,255,255,.025)!important}
+.btm-input-grid input:hover,.btm-text-grid textarea:hover{border-color:rgba(102,185,223,.48);box-shadow:0 0 12px rgba(102,185,223,.045)}.btm-input-grid input:focus,.btm-text-grid textarea:focus{border-color:#66b9df;box-shadow:0 0 0 2px rgba(102,185,223,.07),0 0 16px rgba(102,185,223,.07);outline:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
