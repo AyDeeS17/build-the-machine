@@ -46,32 +46,29 @@ function applyWeekColors(root=document){
     button.style.setProperty('--week-glow',w.glow);
     button.dataset.weekColor=index+1;
     if(index===6)button.dataset.deload='true';
-    else delete button.dataset.deload;
+    else button.removeAttribute('data-deload');
 
-    /* Remove any leftover emblem/logo nodes from older builds. */
+    /* Remove obsolete emblem/logo nodes. Do not rewrite text content here. */
     button.querySelectorAll('.btm-week-emblem,.btm-inline-emblem,.btm-emblem,.btm-emblem-panel').forEach(el=>el.remove());
     button.style.removeProperty('padding-right');
-
-    /* Week 7 gets exactly one visible DELOAD label. */
-    const small=button.querySelector('small');
-    if(small){
-      small.textContent=small.textContent.replace(/\s*·\s*DELOAD/gi,'');
-      if(index===6)small.textContent+=' · DELOAD';
-    }
   });
 }
 
 function boot(){
   applyWeekColors(document);
-  const observer=new MutationObserver(mutations=>{
-    let changed=false;
-    for(const m of mutations){
-      if(m.type==='childList' && (m.addedNodes.length||m.removedNodes.length)){changed=true;break}
-      if(m.type==='attributes' && m.attributeName==='class'){changed=true;break}
-    }
-    if(changed)applyWeekColors(document);
+  const grid=document.getElementById('weekGrid');
+  if(!grid)return;
+
+  let queued=false;
+  const observer=new MutationObserver(()=>{
+    if(queued)return;
+    queued=true;
+    queueMicrotask(()=>{
+      queued=false;
+      applyWeekColors(grid);
+    });
   });
-  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  observer.observe(grid,{childList:true});
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
