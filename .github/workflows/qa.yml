@@ -55,4 +55,4 @@ jobs:
           ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git --exclude='qa.yml' .
       - name: Check legacy character system is gone
         run: |
-          ! grep -RniE 'Goku|Tanjiro Kamado|Yuji Itadori|Eren Yeager|Thorfinn|Vegeta|Gojo Satoru|Toji Fushiguro|Ken Kaneki|Itachi Uchiha|Griffith|Guts|ANIME PROGRESSION|ANIME CHARACTER|MANGA PROGRESSION' --exclude-dir=.git .
+          ! grep -RniE 'Goku|Tanjiro Kamado|Yuji Itadori|Eren Yeager|Thorfinn|Vegeta|Gojo Satoru|Toji Fushiguro|Ken Kaneki|Itachi Uchiha|Griffith|Guts|ANIME PROGRESSION|ANIME CHARACTER|MANGA PROGRESSION' --exclude-dir=.git --exclude='qa.yml' .
