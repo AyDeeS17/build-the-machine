@@ -2,3 +2,5 @@
 #weekGrid .week{padding-right:10px!important}
 .btm-week-manga,.btm-manga-panel,.btm-manga-panel-art,.btm-manga-panel-copy{display:none!important}
 #weekGrid .week::after{display:none!important}
+.btm-character-card .ey,.btm-character-card #charMeta,.btm-character-card #charName,.btm-character-card .btm-silhouette-wrap{display:none!important}
+.btm-character-card{min-height:0!important}
