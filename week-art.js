@@ -1,2 +1,0 @@
-window.WEEK_ART={};
-window.WEEK_ART["1"]="data:image/webp;base64,UklGRiwjAABXRUJQVlA4ICAjAADweACdASrfALwAPm0ukkYkIqGjLfZcMIANiWhsVPdLEBNwc1OC1h/g/l97Ntl/y/98/an9/943dHHp7086P+19Y/639g/9X+mX5if299Xr0of4T1AP7R/yPTJ9lj/C+of+yXp0+zT/dv+/6XH//7OrUadMfEHzd+0/cn2RdH9pf1tfUcQvzc/1fUO9heCnuMAD/WrwRf9T0f+z//V9wH+d/1D/Nch1+L/437HfAF/Nf7J/xv8f+aPyc/+3+v9G36H/pf/T/rfgR/nX9u/6nZD9If9yUd9oBWIWKXTdp+GxX4hu6VYyorEej/QeuMQwhs/62h3L9bWP3yr30JXxhUzXc4N1li61zgRPba6M2erCR0zJ4treTmoZgkWb5+oA40LFXEknkckY/OO+FCjdM6Kv4Ca";
