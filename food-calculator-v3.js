@@ -4,17 +4,33 @@ if(window.__BTM_NUTRITION_MANUAL__) return;
 window.__BTM_NUTRITION_MANUAL__=1;
 const START=new Date('2026-08-10T00:00:00');
 const FOOD_TARGETS=[{carb:300,fat:70},{carb:300,fat:70},{carb:310,fat:70},{carb:310,fat:70},{carb:320,fat:72},{carb:320,fat:72},{carb:270,fat:68},{carb:320,fat:72},{carb:330,fat:72},{carb:330,fat:73},{carb:340,fat:74},{carb:340,fat:75}];
-const read=(k,d={})=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch{return d}};
-const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const STORAGE='btm_nutrition_manual_v4';
+const LEGACY='btm_nutrition_unified';
+const DRAFTS='btm_nutrition_drafts';
+const read=(k,d={})=>{try{const raw=localStorage.getItem(k);return raw?JSON.parse(raw):d}catch{return d}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
 const $=id=>document.getElementById(id);
 const iso=d=>d.toISOString().slice(0,10);
 const dateFor=(w,d)=>{const x=new Date(START);x.setDate(x.getDate()+(w-1)*7+d);return x};
 let foodWeek=1,foodDay=0;
 const key=()=>iso(dateFor(foodWeek,foodDay));
-const official=()=>read('btm_nutrition_unified',{});
-const drafts=()=>read('btm_nutrition_drafts',{});
+const normalise=v=>({cal:Number(v?.cal)||0,pro:Number(v?.pro)||0,carb:Number(v?.carb)||0,fat:Number(v?.fat)||0,water:Number(v?.water)||0,meals:String(v?.meals??''),items:String(v?.items??''),complete:!!v?.complete});
+function migrateStorage(){
+  const existing=read(STORAGE,null);
+  if(existing&&typeof existing==='object') return existing;
+  const legacy=read(LEGACY,{}),oldBuild=read('build_machine_food_v2',{}),oldV2=read('btm_nutrition_v2',{}),old84=read('btm_nutrition_84',{}),merged={};
+  const merge=(source,mapper)=>Object.entries(source||{}).forEach(([k,v])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;merged[k]={...(merged[k]||{}),...mapper(v)}});
+  merge(oldBuild,v=>normalise(v));
+  merge(oldV2,v=>normalise(v));
+  merge(old84,v=>normalise({cal:v?.cal,pro:v?.protein,carb:v?.carbs,fat:v?.fats,water:v?.water,meals:v?.meals,items:v?.items,complete:v?.complete}));
+  merge(legacy,v=>normalise(v));
+  write(STORAGE,merged);
+  return merged;
+}
+const official=()=>migrateStorage();
+const drafts=()=>read(DRAFTS,{});
 const target=w=>({cal:2000,pro:160,carb:FOOD_TARGETS[w-1].carb,fat:FOOD_TARGETS[w-1].fat});
-const ensureDay=()=>official()[key()]||{cal:0,pro:0,carb:0,fat:0,water:0,complete:false};
+const ensureDay=()=>official()[key()]||{cal:0,pro:0,carb:0,fat:0,water:0,meals:'',items:'',complete:false};
 const draftFor=()=>{const d=drafts(),k=key(),o=ensureDay();return d[k]||{cal:o.cal||'',pro:o.pro||'',carb:o.carb||'',fat:o.fat||'',water:o.water??''}};
 const pct=(v,t)=>Math.max(0,Math.min(100,Math.round((Number(v)||0)/(t||1)*100)));
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -29,14 +45,17 @@ function markSelectors(){const days=$('foodDays');if(days)[...days.children].for
 function render(){removeCalculator();const view=$('btm-food-view');if(!view)return;syncSelection();injectStyle();markSelectors();const old=view.querySelector('.btm-manual-wrap');if(old)old.remove();view.querySelectorAll('.btm-hero').forEach(el=>el.style.display='none');const panels=[...view.querySelectorAll(':scope>.panel')];panels.forEach((p,i)=>{p.style.display=(i===0)?'block':'none'});const timeline=panels[0];if(!timeline)return;const wrap=document.createElement('div');wrap.className='btm-manual-wrap';const t=targetsFromExisting(foodWeek),v=draftFor(),saved=official()[key()]||{};wrap.innerHTML=`<div class="btm-manual-panel"><div class="ey">DAILY NUTRITION</div><h2 class="btm-manual-title">MANUAL MACROS</h2><div class="btm-manual-date">${esc(dateFor(foodWeek,foodDay).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).toUpperCase())}</div><div class="btm-manual-grid"><div class="btm-manual-field"><label>Calories, kcal</label><input id="manualCal" type="number" min="0" step="1" value="${esc(v.cal)}"></div><div class="btm-manual-field"><label>Protein, g</label><input id="manualPro" type="number" min="0" step="0.1" value="${esc(v.pro)}"></div><div class="btm-manual-field"><label>Carbs, g</label><input id="manualCarb" type="number" min="0" step="0.1" value="${esc(v.carb)}"></div><div class="btm-manual-field"><label>Fats, g</label><input id="manualFat" type="number" min="0" step="0.1" value="${esc(v.fat)}"></div></div><div class="btm-water-row btm-manual-field"><label>Water, liters</label><input id="manualWater" type="number" min="0" step="0.1" placeholder="2.0" value="${esc(v.water)}"></div><div class="btm-manual-progress" id="manualProgress"></div><div class="btm-water-progress" id="waterProgress"></div><div class="btm-action-row"><div class="btm-actions"><button class="btm-save-day" id="manualSaveDay">SAVE DAY</button><button class="btm-complete-day${saved.complete?' completed':''}" id="manualCompleteDay">${saved.complete?'✓ COMPLETED':'COMPLETE'}</button></div><span class="btm-saved${saved.cal!==undefined||saved.pro!==undefined?' show':''}" id="manualSaved">✓ SAVED</span></div><div class="btm-week-progress"><span>WEEK ${foodWeek} COMPLETION</span><strong id="weekCompletion">${weekCount(foodWeek)} / 7 DAYS</strong></div><div class="btm-overall-progress">12-WEEK NUTRITION COMPLETION, <strong id="overallCompletion">${totalCompleted()} / 84 DAYS</strong></div></div>`;timeline.insertAdjacentElement('afterend',wrap);
 const fields={cal:$('manualCal'),pro:$('manualPro'),carb:$('manualCarb'),fat:$('manualFat'),water:$('manualWater')};
 function updateProgress(){const p=$('manualProgress'),vals={cal:fields.cal.value,pro:fields.pro.value,carb:fields.carb.value,fat:fields.fat.value};p.innerHTML=[['Calories',vals.cal,t.cal,' kcal'],['Protein',vals.pro,t.pro,'g'],['Carbs',vals.carb,t.carb,'g'],['Fats',vals.fat,t.fat,'g']].map(([n,v,target,unit])=>`<div class="btm-macro"><div class="btm-macro-head"><strong>${n}</strong><span>${esc(v||0)} / ${target}${unit}</span></div><div class="btm-macro-bar"><i style="width:${pct(v,target)}%"></i></div></div>`).join('');const water=Number(fields.water.value)||0,wp=$('waterProgress');wp.classList.toggle('reached',water>=2);wp.innerHTML=`<div>💧 WATER: <strong>${water.toFixed(1)} / 2.0 L</strong>${water>=2?' · ✓ TARGET REACHED':''}</div><div class="btm-water-bar"><i style="width:${pct(water,2)}%"></i></div>`}
-function updateDraft(){const d=drafts();d[key()]={cal:fields.cal.value,pro:fields.pro.value,carb:fields.carb.value,fat:fields.fat.value,water:fields.water.value};write('btm_nutrition_drafts',d);updateProgress()}
+function updateDraft(){const d=drafts();d[key()]={cal:fields.cal.value,pro:fields.pro.value,carb:fields.carb.value,fat:fields.fat.value,water:fields.water.value};write(DRAFTS,d);updateProgress()}
 Object.values(fields).forEach(i=>i.addEventListener('input',updateDraft));
-function saveCurrent(complete){const all=official(),k=key(),x=all[k]||{cal:0,pro:0,carb:0,fat:0,water:0,complete:false};x.cal=Number(fields.cal.value)||0;x.pro=Number(fields.pro.value)||0;x.carb=Number(fields.carb.value)||0;x.fat=Number(fields.fat.value)||0;x.water=Number(fields.water.value)||0;if(complete)x.complete=true;all[k]=x;write('btm_nutrition_unified',all);const d=drafts();delete d[k];write('btm_nutrition_drafts',d);return x}
+function saveCurrent(complete){const all=official(),k=key(),x={...ensureDay()};x.cal=Number(fields.cal.value)||0;x.pro=Number(fields.pro.value)||0;x.carb=Number(fields.carb.value)||0;x.fat=Number(fields.fat.value)||0;x.water=Number(fields.water.value)||0;if(complete)x.complete=true;all[k]=normalise(x);write(STORAGE,all);write(LEGACY,all);const d=drafts();delete d[k];write(DRAFTS,d);return all[k]}
 $('manualSaveDay').onclick=()=>{saveCurrent(false);const status=$('manualSaved');status.classList.remove('show');requestAnimationFrame(()=>status.classList.add('show'));$('manualCompleteDay').classList.toggle('completed',!!official()[key()]?.complete);$('manualCompleteDay').textContent=official()[key()]?.complete?'✓ COMPLETED':'COMPLETE';markSelectors();$('weekCompletion').textContent=weekCount(foodWeek)+' / 7 DAYS';$('overallCompletion').textContent=totalCompleted()+' / 84 DAYS'};
 $('manualCompleteDay').onclick=()=>{saveCurrent(true);const btn=$('manualCompleteDay');btn.classList.add('completed');btn.textContent='✓ COMPLETED';const status=$('manualSaved');status.classList.add('show');markSelectors();$('weekCompletion').textContent=weekCount(foodWeek)+' / 7 DAYS';$('overallCompletion').textContent=totalCompleted()+' / 84 DAYS'};
 updateProgress();markSelectors()}
 function nutritionCompletionPercent(w){return Math.round(weekCount(w)/7*100)}
 function syncOverallProgress(){if(document.body.dataset.section!=='progress')return;const table=$('overallTable');if(!table)return;const rows=[...table.querySelectorAll('tr')].slice(1);const vals=[];rows.forEach((row,idx)=>{const cells=row.querySelectorAll('td');if(cells.length<6)return;const w=idx+1,n=nutritionCompletionPercent(w);cells[3].textContent=n+'%';const tr=parseFloat(cells[1].textContent)||0,run=parseFloat(cells[2].textContent)||0,sleep=parseFloat(cells[4].textContent)||0,overall=Math.round(tr*.35+run*.2+n*.25+sleep*.2);cells[5].innerHTML='<b>'+overall+'%</b>';vals.push(overall)});const overall=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;if($('overallPercent'))$('overallPercent').textContent=overall+'%';if($('overallBar'))$('overallBar').style.width=overall+'%';const kpis=$('overallKpis');if(kpis){const cards=[...kpis.querySelectorAll('.btm-kpi')],nutrition=totalCompleted();cards.forEach(card=>{const label=card.querySelector('span')?.textContent||'';if(label==='Nutrition days')card.querySelector('b').textContent=nutrition})}}
-function boot(){const view=$('btm-food-view');if(!view){setTimeout(boot,150);return}const observer=new MutationObserver(()=>{if(document.body.dataset.section==='food'&&!view.querySelector('.btm-manual-wrap'))render();else if(document.body.dataset.section==='food')markSelectors()});observer.observe(view,{childList:true,subtree:true});const globalObserver=new MutationObserver(()=>{if(document.body.dataset.section==='progress')setTimeout(syncOverallProgress,0)});globalObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-section']});render();window.BTMNutritionRefresh=render}
+function boot(){const view=$('btm-food-view');if(!view){setTimeout(boot,150);return}const observer=new MutationObserver(()=>{if(document.body.dataset.section==='food'&&!view.querySelector('.btm-manual-wrap'))render();else if(document.body.dataset.section==='food')markSelectors()});observer.observe(view,{childList:true,subtree:true});const globalObserver=new MutationObserver(()=>{if(document.body.dataset.section==='progress')setTimeout(syncOverallProgress,0)});globalObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-section']});render();window.BTMNutritionRefresh=render;
+  const persistDrafts=()=>{try{const d=drafts();const wrap=document.querySelector('.btm-manual-wrap');if(!wrap)return;const f={cal:$('manualCal')?.value??'',pro:$('manualPro')?.value??'',carb:$('manualCarb')?.value??'',fat:$('manualFat')?.value??'',water:$('manualWater')?.value??''};d[key()]=f;write(DRAFTS,d)}catch{}};
+  window.addEventListener('pagehide',persistDrafts,{once:false});
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
