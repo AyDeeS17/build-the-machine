@@ -1,0 +1,30 @@
+name: Build The Machine QA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check app-shell.js
+          node --check ripple.js
+          node --check nav-reorder.js
+          node --check rules.js
+          node --check enhancements.js
+          node --check ui-polish.js
+      - name: Check navigation contract
+        run: |
+          grep -q 'id="trainingBtn"' index.html
+          grep -q 'id="runningBtn"' index.html
+          grep -q 'id="foodBtn"' index.html
+          grep -q 'id="sleepBtn"' index.html
+          grep -q 'id="progressBtn"' index.html
+          grep -q 'id="rulesBtn"' index.html
+          grep -q 'btm-navigation-order-v1' nav-reorder.js
+      - name: Check removed MACHINE effects stay removed
+        run: |
+          ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
