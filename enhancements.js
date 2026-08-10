@@ -20,82 +20,12 @@ const EMBLEMS=[
 ];
 
 const css=`
-.btm-character-card{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:20px;align-items:stretch;min-height:185px;overflow:hidden}
-.btm-character-card .btm-emblem-panel{position:relative;display:flex;align-items:center;justify-content:center;min-height:150px;border:1px solid #294656;border-radius:8px;background:radial-gradient(circle at 50% 38%,rgba(102,185,223,.18),transparent 58%),#09141b;overflow:hidden}
-.btm-character-card .btm-emblem-panel:before{content:'';position:absolute;inset:10px;border:1px solid rgba(102,185,223,.12);border-radius:6px;pointer-events:none}
-.btm-emblem{width:104px;height:104px;display:grid;place-items:center;color:#66b9df;filter:drop-shadow(0 0 14px rgba(102,185,223,.22));transition:transform .28s ease,filter .28s ease,opacity .28s ease}
-.btm-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-.btm-emblem svg circle:first-child{fill:rgba(102,185,223,.08)}
-.btm-emblem-label{position:absolute;left:14px;bottom:11px;font:8px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:#8195a3}
-.btm-emblem-panel:hover .btm-emblem{transform:translateY(-3px) scale(1.035);filter:drop-shadow(0 0 20px rgba(102,185,223,.38))}
-.btm-week-emblem{position:absolute;right:10px;top:50%;width:42px;height:42px;transform:translateY(-50%);display:grid;place-items:center;color:#66b9df;opacity:.7;transition:transform .25s ease,opacity .25s ease,filter .25s ease}
-.btm-week-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-.week{position:relative;padding-right:60px}
-.week:hover .btm-week-emblem,.week.active .btm-week-emblem{opacity:1;transform:translateY(-50%) scale(1.08);filter:drop-shadow(0 0 10px rgba(102,185,223,.32))}
-.btm-character-card .btm-emblem-panel .btm-emblem{animation:btmEmblemIn .36s ease both}
-@keyframes btmEmblemIn{from{opacity:0;transform:translateY(6px) scale(.92)}to{opacity:1;transform:none}}
-@media(max-width:700px){.btm-character-card{grid-template-columns:1fr 150px}.btm-emblem{width:82px;height:82px}.btm-week-emblem{width:34px;height:34px;right:8px}.week{padding-right:50px}}
-@media(prefers-reduced-motion:reduce){.btm-emblem,.btm-week-emblem{transition:none!important;animation:none!important}}
+.btm-character-card{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:20px;align-items:stretch;min-height:185px;overflow:hidden}.btm-character-copy{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0}.btm-character-copy .btm-inline-emblem{position:absolute;right:18px;top:50%;width:58px;height:58px;transform:translateY(-50%);color:#66b9df;opacity:.9;filter:drop-shadow(0 0 10px rgba(102,185,223,.18));pointer-events:none}.btm-inline-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.btm-character-card .btm-emblem-panel{position:relative;display:flex;align-items:center;justify-content:center;min-height:150px;border:1px solid #294656;border-radius:8px;background:radial-gradient(circle at 50% 38%,rgba(102,185,223,.18),transparent 58%),#09141b;overflow:hidden}.btm-character-card .btm-emblem-panel:before{content:'';position:absolute;inset:10px;border:1px solid rgba(102,185,223,.12);border-radius:6px;pointer-events:none}.btm-emblem{width:104px;height:104px;display:grid;place-items:center;color:#66b9df;filter:drop-shadow(0 0 14px rgba(102,185,223,.22));transition:transform .28s ease,filter .28s ease,opacity .28s ease}.btm-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.btm-emblem svg circle:first-child{fill:rgba(102,185,223,.08)}.btm-emblem-label{position:absolute;left:14px;bottom:11px;font:8px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:#8195a3}.btm-emblem-panel:hover .btm-emblem{transform:translateY(-3px) scale(1.035);filter:drop-shadow(0 0 20px rgba(102,185,223,.38))}.btm-week-emblem{position:absolute;right:10px;top:50%;width:42px;height:42px;transform:translateY(-50%);display:grid;place-items:center;color:#66b9df;opacity:.7;transition:transform .25s ease,opacity .25s ease,filter .25s ease}.btm-week-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.week{position:relative;padding-right:60px}.week:hover .btm-week-emblem,.week.active .btm-week-emblem{opacity:1;transform:translateY(-50%) scale(1.08);filter:drop-shadow(0 0 10px rgba(102,185,223,.32))}.btm-character-card .btm-emblem-panel .btm-emblem{animation:btmEmblemIn .36s ease both}@keyframes btmEmblemIn{from{opacity:0;transform:translateY(6px) scale(.92)}to{opacity:1;transform:none}}@media(max-width:700px){.btm-character-card{grid-template-columns:minmax(0,1fr) 150px}.btm-character-copy .btm-inline-emblem{width:44px;height:44px;right:10px}.btm-emblem{width:82px;height:82px}.btm-week-emblem{width:34px;height:34px;right:8px}.week{padding-right:50px}}@media(prefers-reduced-motion:reduce){.btm-emblem,.btm-week-emblem{transition:none!important;animation:none!important}}
 `;
 const style=document.createElement('style');style.id='btm-character-emblem-style';style.textContent=css;document.head.appendChild(style);
-
 function markup(index,extra=''){const e=EMBLEMS[index%EMBLEMS.length];return `<span class="btm-emblem" data-emblem-index="${index}" title="${e.name}" aria-label="${e.name}">${e.svg}</span>${extra}`}
-function decorateWeekButtons(grid){
-  if(!grid)return;
-  grid.querySelectorAll('.week').forEach((button,index)=>{
-    const weekIndex=index;
-    let icon=button.querySelector('.btm-week-emblem');
-    if(!icon){
-      icon=document.createElement('span');
-      icon.className='btm-week-emblem';
-      icon.setAttribute('aria-hidden','true');
-      icon.innerHTML=EMBLEMS[weekIndex].svg;
-      button.appendChild(icon);
-    }else if(icon.dataset.index!==String(weekIndex)){
-      icon.dataset.index=String(weekIndex);icon.innerHTML=EMBLEMS[weekIndex].svg;
-    }
-  });
-}
-function patchCharacterCard(){
-  const card=document.getElementById('btm-character-card');
-  const grid=document.getElementById('weekGrid');
-  if(!card||!grid)return false;
-  decorateWeekButtons(grid);
-  const wrap=card.querySelector('.btm-silhouette-wrap');
-  if(wrap){
-    const reveal=card.querySelector('#charReveal');
-    const right=document.createElement('div');
-    right.className='btm-emblem-panel';
-    right.id='btm-selected-emblem-panel';
-    right.innerHTML=markup(Math.max(0,[...grid.querySelectorAll('.week')].findIndex(b=>b.classList.contains('active'))),'<span class="btm-emblem-label">CHARACTER EMBLEM</span>');
-    wrap.replaceWith(right);
-    if(reveal)reveal.style.display='none';
-  }
-  const update=()=>{
-    const buttons=[...grid.querySelectorAll('.week')];
-    const idx=Math.max(0,buttons.findIndex(b=>b.classList.contains('active')));
-    decorateWeekButtons(grid);
-    const panel=card.querySelector('#btm-selected-emblem-panel');
-    if(panel){
-      const old=panel.querySelector('.btm-emblem');
-      if(old){old.outerHTML=markup(idx)}
-      panel.querySelector('.btm-emblem-label')?.remove();
-      const label=document.createElement('span');label.className='btm-emblem-label';label.textContent=EMBLEMS[idx].name;panel.appendChild(label);
-    }
-  };
-  update();
-  if(!card.__btmEmblemObserver){
-    const observer=new MutationObserver(()=>update());
-    observer.observe(grid,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
-    card.__btmEmblemObserver=observer;
-  }
-  return true;
-}
-
-const boot=()=>{
-  if(patchCharacterCard())return;
-  const observer=new MutationObserver(()=>{if(patchCharacterCard())observer.disconnect()});
-  observer.observe(document.body,{subtree:true,childList:true});
-};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+function decorateWeekButtons(grid){if(!grid)return;grid.querySelectorAll('.week').forEach((button,index)=>{const weekIndex=index;let icon=button.querySelector('.btm-week-emblem');if(!icon){icon=document.createElement('span');icon.className='btm-week-emblem';icon.setAttribute('aria-hidden','true');icon.innerHTML=EMBLEMS[weekIndex].svg;button.appendChild(icon)}else if(icon.dataset.index!==String(weekIndex)){icon.dataset.index=String(weekIndex);icon.innerHTML=EMBLEMS[weekIndex].svg}})}
+function patchCharacterCard(){const card=document.getElementById('btm-character-card'),grid=document.getElementById('weekGrid');if(!card||!grid)return false;decorateWeekButtons(grid);const wrap=card.querySelector('.btm-silhouette-wrap');if(wrap){const reveal=card.querySelector('#charReveal'),copy=card.firstElementChild;if(copy&&!copy.querySelector('.btm-inline-emblem')){copy.classList.add('btm-character-copy');const inline=document.createElement('span');inline.className='btm-inline-emblem';inline.setAttribute('aria-hidden','true');copy.appendChild(inline)}const right=document.createElement('div');right.className='btm-emblem-panel';right.id='btm-selected-emblem-panel';right.innerHTML=markup(Math.max(0,[...grid.querySelectorAll('.week')].findIndex(b=>b.classList.contains('active'))),'<span class="btm-emblem-label">CHARACTER EMBLEM</span>');wrap.replaceWith(right);if(reveal)reveal.style.display='none'}const update=()=>{const buttons=[...grid.querySelectorAll('.week')],idx=Math.max(0,buttons.findIndex(b=>b.classList.contains('active')));decorateWeekButtons(grid);const inline=card.querySelector('.btm-inline-emblem');if(inline)inline.innerHTML=EMBLEMS[idx].svg;const panel=card.querySelector('#btm-selected-emblem-panel');if(panel){const old=panel.querySelector('.btm-emblem');if(old)old.outerHTML=markup(idx);panel.querySelector('.btm-emblem-label')?.remove();const label=document.createElement('span');label.className='btm-emblem-label';label.textContent=EMBLEMS[idx].name;panel.appendChild(label)}};update();if(!card.__btmEmblemObserver){const observer=new MutationObserver(()=>update());observer.observe(grid,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});card.__btmEmblemObserver=observer}return true}
+const boot=()=>{if(patchCharacterCard())return;const observer=new MutationObserver(()=>{if(patchCharacterCard())observer.disconnect()});observer.observe(document.body,{subtree:true,childList:true})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
