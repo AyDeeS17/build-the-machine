@@ -1,7 +1,6 @@
 name: Restore dashboard sections
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -9,26 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Restore unified dashboard shell
+      - name: Restore unified dashboard shell from the verified recovery snapshot
         run: |
           curl -fsSL https://raw.githubusercontent.com/AyDeeS17/build-the-machine/9c3b5c7cce5c06cc69f1469ca7157f1af4be6e49/app-shell.js -o app-shell.js
           python - <<'PY'
           from pathlib import Path
           import re
-          p=Path('app-shell.js')
-          s=p.read_text()
+          p=Path('app-shell.js'); s=p.read_text()
           s=re.sub(r"const PHASES=\[[^;]+;\nconst CHARS=\[[^;]+;", "const PHASES=['NOVICE','BEGINNER','TRAINEE','APPRENTICE','SKILLED','ADVANCED','RECOVERY','ELITE','EXPERT','MASTER','GRANDMASTER','LEGEND'];", s, count=1, flags=re.S)
           s=s.replace('enhanceTraining();','')
           s=re.sub(r'function enhanceTraining\(\)\{.*?\n\}\nfunction draw', 'function draw', s, count=1, flags=re.S)
           p.write_text(s)
-          q=Path('index.html')
-          h=q.read_text()
-          if './polish.css' not in h: h=h.replace('</head>','<link rel="stylesheet" href="./polish.css"></head>')
-          if './app-shell.js' not in h: h=h.replace('</body>','<script src="./app-shell.js"></script></body>')
-          q.write_text(h)
           PY
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add app-shell.js index.html
-          git diff --cached --quiet || git commit -m "Restore unified dashboard sections"
+          git add app-shell.js
+          git diff --cached --quiet || git commit -m "Restore verified dashboard shell"
           git push
