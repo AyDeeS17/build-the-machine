@@ -6,7 +6,6 @@
   const getButtons=()=>DEFAULT_ORDER.map(id=>document.getElementById(id)).filter(Boolean);
   const getOrder=()=>{try{const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');return Array.isArray(v)?v:DEFAULT_ORDER}catch{return DEFAULT_ORDER}};
   let reset=null;
-
   const style=document.createElement('style');
   style.textContent=`
     .btm-nav .btm-reset-order{position:relative;isolation:isolate;overflow:hidden;margin-left:2px;display:inline-flex;align-items:center;justify-content:center;min-width:118px;height:34px;padding:0 14px;border:1px solid rgba(187,83,67,.58);border-radius:6px;background:linear-gradient(145deg,#21171a,#120f12);color:#d6a29a;font:10px 'JetBrains Mono';font-weight:700;letter-spacing:.06em;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.025);transition:transform .2s ease,border-color .25s ease,box-shadow .3s ease,color .2s ease,background .25s ease}
@@ -21,7 +20,6 @@
     @media(prefers-reduced-motion:reduce){.btm-nav .btm-reset-order{transition:none!important}.btm-nav .btm-reset-order::before,.btm-nav .btm-reset-order::after{animation:none!important;transition:none!important}}
   `;
   document.head.appendChild(style);
-
   const applyOrder=()=>{const map=new Map(getButtons().map(b=>[b.id,b]));getOrder().forEach(id=>{const b=map.get(id);if(b)nav.insertBefore(b,reset)});DEFAULT_ORDER.forEach(id=>{const b=map.get(id);if(b&&!nav.contains(b))nav.insertBefore(b,reset)})};
   reset=document.createElement('button');reset.type='button';reset.className='btm-reset-order';reset.textContent='RESET ORDER';reset.title='Restore the default section order';nav.appendChild(reset);
   reset.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();localStorage.removeItem(STORAGE_KEY);applyOrder()});
@@ -38,4 +36,7 @@
     btn.addEventListener('pointercancel',()=>finish(true));
     btn.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopImmediatePropagation();moved=false}},true);
   });
+  const themeScript=document.createElement('script');
+  themeScript.src='./theme.js';
+  document.head.appendChild(themeScript);
 })();
