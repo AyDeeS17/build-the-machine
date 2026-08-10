@@ -19,7 +19,6 @@ const CHARACTERS=[
   {id:12,name:'Guts',quote:'There is no paradise for you to escape to.'}
 ];
 
-/* Week cards belong entirely to the original training UI. Do not rebuild them. */
 const css=`
 .btm-selected-week-quote{margin:14px 0 0;max-width:820px;color:var(--muted,#8195a3);font:italic 15px/1.45 'Barlow Condensed',sans-serif}
 .btm-selected-week-quote::before{content:'“';color:var(--blue,#66b9df);font-family:Georgia,serif;font-size:24px;line-height:0;vertical-align:-5px;margin-right:3px}
@@ -52,6 +51,31 @@ function removeAccidentalDuplicateCards(grid,keep){
   weekPanel.querySelectorAll('.btm-selected-week-panel').forEach(card=>{if(card!==keep)card.remove()});
 }
 
+function removeUnwantedAvatar(card){
+  if(!card)return;
+
+  /* Remove the old right-side avatar/emblem container without touching the
+     selected Week text or quote. The original card is kept intact. */
+  const children=[...card.children];
+  const candidates=children.filter(el=>{
+    if(el.classList.contains('btm-selected-week-quote'))return false;
+    if((el.textContent||'').trim())return false;
+    const r=el.getBoundingClientRect();
+    return r.width>100&&r.height>80;
+  });
+
+  if(candidates.length){
+    const target=candidates.sort((a,b)=>b.getBoundingClientRect().right-a.getBoundingClientRect().right)[0];
+    target.remove();
+  }
+
+  /* Also remove any old avatar element if it was nested inside a wrapper. */
+  card.querySelectorAll('img').forEach(img=>{
+    const r=img.getBoundingClientRect();
+    if(r.width>80&&r.height>80)img.remove();
+  });
+}
+
 function updateSelectedCard(grid){
   const active=grid.querySelector('.week.active');
   const id=weekId(active)||1;
@@ -60,6 +84,7 @@ function updateSelectedCard(grid){
   const card=getSelectedCard(grid);
   if(!card)return;
   removeAccidentalDuplicateCards(grid,card);
+  removeUnwantedAvatar(card);
 
   let quote=card.querySelector('.btm-selected-week-quote');
   if(!quote){
