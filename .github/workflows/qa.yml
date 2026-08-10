@@ -12,6 +12,7 @@ jobs:
         run: |
           node --check app-shell.js
           node --check ripple.js
+          node --check running-polish.js
           node --check nav-reorder.js
           node --check rules.js
           node --check enhancements.js
@@ -25,6 +26,10 @@ jobs:
           grep -q 'id="progressBtn"' index.html
           grep -q 'id="rulesBtn"' index.html
           grep -q 'btm-navigation-order-v1' nav-reorder.js
+      - name: Check running schedule contract
+        run: |
+          grep -q 'ACTIVE_DAYS=new Set(\[0,2,4\])' running-polish.js
+          grep -q 'btm_running_non_training_backup_v1' running-polish.js
       - name: Check removed MACHINE effects stay removed
         run: |
           ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
