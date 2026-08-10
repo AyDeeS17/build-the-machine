@@ -39,7 +39,8 @@ h1 span,.ey,.banner h2,.stat b,.nav-icon{color:var(--theme-primary)!important}
 .day-head{background:linear-gradient(135deg,var(--theme-dark),var(--panel2))!important;border-color:var(--line)!important}
 .sets input,.food input,.food textarea{background:var(--theme-input)!important;border-color:var(--line)!important;color:var(--text)!important}
 .sets input:focus,.food input:focus,.food textarea:focus{outline:none;border-color:var(--theme-primary)!important;box-shadow:0 0 0 2px var(--theme-glow)}
-.bar{background:var(--line)!important}
+.bar{background:var(--line)!important}.bar i{background:var(--theme-primary)!important;box-shadow:0 0 10px var(--theme-glow)}
+.check{accent-color:var(--theme-primary)!important}
 .save{background:var(--theme-primary)!important;color:var(--bg)!important;box-shadow:0 0 18px var(--theme-glow)}
 .week b{color:var(--theme-primary)!important}
 .chart{border-color:var(--line)!important;background:var(--theme-input)!important}
