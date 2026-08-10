@@ -1,47 +1,90 @@
-/* Build The Machine, achievement rank progression. */
+/* Build The Machine, unified achievement-rank system. */
 (()=>{
 'use strict';
-if(window.__BTM_WEEK_SELECTOR_FIX__)return;
-window.__BTM_WEEK_SELECTOR_FIX__=1;
+if(window.__BTM_UNIFIED_RANK_SYSTEM__)return;
+window.__BTM_UNIFIED_RANK_SYSTEM__=1;
 
 const RANKS=[
-  {id:1,name:'NOVICE',quote:'Every expert was once willing to begin.'},
-  {id:2,name:'BEGINNER',quote:'Small steps become serious progress when you refuse to stop.'},
-  {id:3,name:'TRAINEE',quote:'Consistency turns effort into ability.'},
-  {id:4,name:'APPRENTICE',quote:'Skill grows when discipline becomes routine.'},
-  {id:5,name:'SKILLED',quote:'You are no longer learning the work, you are becoming the work.'},
-  {id:6,name:'ADVANCED',quote:'Discipline begins where excuses lose their power.'},
-  {id:7,name:'RECOVERY',quote:'Recovery is not retreat, it is how strength prepares to rise again.'},
-  {id:8,name:'ELITE',quote:'You earned your place by doing what most people abandon.'},
-  {id:9,name:'EXPERT',quote:'Control your effort, sharpen your execution, raise your standard.'},
-  {id:10,name:'MASTER',quote:'Mastery is built through consistency when motivation disappears.'},
-  {id:11,name:'GRANDMASTER',quote:'At this level, discipline is no longer an action, it is an identity.'},
-  {id:12,name:'LEGEND',quote:'The final level is not the end, it is proof of what you became.'}
+  ['NOVICE','Every expert was once willing to begin.'],
+  ['BEGINNER','Small steps become serious progress when you refuse to stop.'],
+  ['TRAINEE','Consistency turns effort into ability.'],
+  ['APPRENTICE','Skill grows when discipline becomes routine.'],
+  ['SKILLED','You are no longer learning the work, you are becoming the work.'],
+  ['ADVANCED','Discipline begins where excuses lose their power.'],
+  ['RECOVERY','Recovery is not retreat, it is how strength prepares to rise again.'],
+  ['ELITE','You earned your place by doing what most people abandon.'],
+  ['EXPERT','Control your effort, sharpen your execution, raise your standard.'],
+  ['MASTER','Mastery is built through consistency when motivation disappears.'],
+  ['GRANDMASTER','At this level, discipline is no longer an action, it is an identity.'],
+  ['LEGEND','The final level is not the end, it is proof of what you became.']
 ];
+const COLORS=['#66b9df','#71c7b4','#8ccf6b','#c9d35c','#e4bd5b','#e69a57','#d97878','#c86fc4','#b978e6','#8d8fe8','#6f9ee8','#66b9df'];
 const OLD_NAMES=['Goku','Tanjiro Kamado','Yuji Itadori','Eren Yeager','Thorfinn','Vegeta','Gojo Satoru','Toji Fushiguro','Ken Kaneki','Itachi Uchiha','Griffith','Guts'];
-const WEEK_COLORS=['#66b9df','#71c7b4','#8ccf6b','#c9d35c','#e4bd5b','#e69a57','#d97878','#c86fc4','#b978e6','#8d8fe8','#6f9ee8','#66b9df'];
+const OLD_TERMS=['ANIME PROGRESSION','ANIME CHARACTER','CHARACTER PROGRESSION','MANGA PROGRESSION'];
 
-const css=`
-.btm-selected-week-rank{margin:16px 0 0;max-width:920px;color:var(--rank-color,#66b9df);font:400 clamp(28px,3.6vw,42px)/1 Anton,sans-serif;letter-spacing:.025em;transition:opacity .28s ease,transform .28s ease,color .35s ease}
-.btm-selected-week-rank.is-switching{opacity:0;transform:translateY(7px);filter:blur(4px)}
-.btm-selected-week-quote{margin:5px 0 0;max-width:920px;color:#eef7fa;font:700 clamp(20px,2.7vw,30px)/1.15 'Barlow Condensed',sans-serif;letter-spacing:.015em;text-wrap:balance;text-shadow:0 0 1px var(--rank-color,#66b9df),0 0 7px color-mix(in srgb,var(--rank-color,#66b9df) 42%,transparent),0 0 16px color-mix(in srgb,var(--rank-color,#66b9df) 18%,transparent);animation:btm-rank-pulse 4.8s ease-in-out infinite;transition:opacity .28s ease,transform .28s ease,color .35s ease,text-shadow .35s ease}
-@keyframes btm-rank-pulse{0%,100%{text-shadow:0 0 1px var(--rank-color,#66b9df),0 0 6px color-mix(in srgb,var(--rank-color,#66b9df) 36%,transparent),0 0 14px color-mix(in srgb,var(--rank-color,#66b9df) 15%,transparent)}50%{text-shadow:0 0 1px var(--rank-color,#66b9df),0 0 9px color-mix(in srgb,var(--rank-color,#66b9df) 48%,transparent),0 0 20px color-mix(in srgb,var(--rank-color,#66b9df) 22%,transparent)}}
-.btm-rank-week{--rank-color:#66b9df;transition:background .3s ease,border-color .3s ease,box-shadow .3s ease,color .3s ease}
-.btm-rank-week b{color:var(--rank-color)!important}.btm-rank-week:hover{border-color:var(--rank-color)!important;box-shadow:0 0 14px color-mix(in srgb,var(--rank-color) 25%,transparent)}
-.btm-rank-week .btm-rank-label{display:block;margin-top:5px;color:var(--rank-color);font:700 11px 'JetBrains Mono'}
-@media(prefers-reduced-motion:reduce){.btm-selected-week-quote{animation:none!important}.btm-selected-week-rank,.btm-selected-week-quote{transition:opacity .2s ease,color .2s ease}.btm-selected-week-rank.is-switching{transform:none;filter:none}}
+const css=document.createElement('style');
+css.id='btm-unified-rank-style';
+css.textContent=`
+.btm-unified-rank-panel{position:relative;min-height:150px;margin:18px 0;padding:24px 28px;border:1px solid var(--rank-color,#66b9df);border-radius:8px;background:radial-gradient(circle at 82% 35%,color-mix(in srgb,var(--rank-color,#66b9df) 10%,transparent),transparent 42%),linear-gradient(145deg,#13202a,#0d161d);overflow:hidden;transition:border-color .35s ease,box-shadow .35s ease,opacity .22s ease,transform .22s ease}
+.btm-unified-rank-panel::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--rank-color,#66b9df) 3%,transparent),transparent);pointer-events:none}
+.btm-unified-rank-kicker{position:relative;font:9px 'JetBrains Mono';letter-spacing:.22em;color:var(--muted)}
+.btm-unified-rank-name{position:relative;margin-top:5px;font:clamp(36px,5vw,52px)/.95 Anton,sans-serif;letter-spacing:.02em;color:var(--rank-color,#66b9df);text-shadow:0 0 8px color-mix(in srgb,var(--rank-color,#66b9df) 28%,transparent)}
+.btm-unified-rank-quote{position:relative;margin-top:10px;max-width:900px;font:700 clamp(20px,2.7vw,30px)/1.12 'Barlow Condensed',sans-serif;color:#eef7fa;text-wrap:balance;text-shadow:0 0 2px var(--rank-color,#66b9df),0 0 8px color-mix(in srgb,var(--rank-color,#66b9df) 42%,transparent),0 0 17px color-mix(in srgb,var(--rank-color,#66b9df) 18%,transparent);animation:btmUnifiedRankPulse 4.8s ease-in-out infinite}
+.btm-unified-rank-quote::before{content:'“';color:var(--rank-color,#66b9df);font-family:Georgia,serif;margin-right:4px}.btm-unified-rank-quote::after{content:'”';color:var(--rank-color,#66b9df);font-family:Georgia,serif;margin-left:4px}
+@keyframes btmUnifiedRankPulse{0%,100%{text-shadow:0 0 2px var(--rank-color,#66b9df),0 0 7px color-mix(in srgb,var(--rank-color,#66b9df) 36%,transparent),0 0 15px color-mix(in srgb,var(--rank-color,#66b9df) 15%,transparent)}50%{text-shadow:0 0 2px var(--rank-color,#66b9df),0 0 10px color-mix(in srgb,var(--rank-color,#66b9df) 50%,transparent),0 0 21px color-mix(in srgb,var(--rank-color,#66b9df) 23%,transparent)}}
+.btm-unified-rank-panel.is-switching{opacity:.35;transform:translateY(4px)}
+.week.btm-unified-rank-week{--rank-color:#66b9df;transition:background .3s ease,border-color .3s ease,box-shadow .3s ease,color .3s ease}.week.btm-unified-rank-week b{color:var(--rank-color)!important}.week.btm-unified-rank-week span{color:#dce9ee}.week.btm-unified-rank-week small{color:#718894}.week.btm-unified-rank-week:hover{border-color:var(--rank-color)!important;box-shadow:0 0 15px color-mix(in srgb,var(--rank-color) 24%,transparent)}
+@media(prefers-reduced-motion:reduce){.btm-unified-rank-quote{animation:none}.btm-unified-rank-panel{transition:none}}
 `;
-const style=document.createElement('style');style.id='btm-week-rank-style';style.textContent=css;document.head.appendChild(style);
+document.head.appendChild(css);
 
-function weekId(button){const explicit=Number(button?.dataset.weekId||button?.dataset.week);if(Number.isInteger(explicit)&&explicit>=1&&explicit<=12)return explicit;const m=(button?.textContent||'').match(/\bWEEK\s*(\d{1,2})\b/i);return m?Number(m[1]):null}
-function activeWeek(){return weekId(document.querySelector('#weekGrid .week.active'))||1}
-function colorFor(id,card){const computed=card?getComputedStyle(card):null;const vars=['--difficulty-color','--week-color','--accent','--theme-primary'];if(computed)for(const v of vars){const x=computed.getPropertyValue(v).trim();if(x)return x}return WEEK_COLORS[id-1]||WEEK_COLORS[0]}
-function stripAnime(root){if(!root)return;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const node of nodes){let text=node.nodeValue;for(const name of OLD_NAMES)text=text.replaceAll(name,'');if(text!==node.nodeValue)node.nodeValue=text}}
-function findSelectedPanel(grid){const host=grid.closest('.panel');if(!host)return null;const candidates=[...host.querySelectorAll('.panel')];return candidates.find(x=>/ANIME PROGRESSION|REVEAL\s*\d+%/i.test(x.textContent||''))||candidates.find(x=>x.querySelector('.btm-selected-week-quote'))||null}
-function ensurePanel(grid,id,color){let panel=findSelectedPanel(grid);if(!panel){panel=document.createElement('section');panel.className='panel btm-achievement-panel';grid.closest('.panel')?.after(panel)}panel.classList.add('btm-achievement-panel');panel.style.setProperty('--rank-color',color);let rank=panel.querySelector('.btm-selected-week-rank');let quote=panel.querySelector('.btm-selected-week-quote');if(!rank){rank=document.createElement('div');rank.className='btm-selected-week-rank';panel.appendChild(rank)}if(!quote){quote=document.createElement('div');quote.className='btm-selected-week-quote';panel.appendChild(quote)}return {panel,rank,quote}}
-function apply(){const grid=document.getElementById('weekGrid');if(!grid)return;const cards=[...grid.querySelectorAll('.week')];cards.forEach((card,index)=>{const id=index+1,rank=RANKS[id-1],color=colorFor(id,card);card.classList.add('btm-rank-week');card.style.setProperty('--rank-color',color);card.dataset.rank=rank.name;const b=card.querySelector('b');if(b)b.textContent='WEEK '+id;card.querySelectorAll('.btm-rank-label').forEach(x=>x.remove());const label=document.createElement('span');label.className='btm-rank-label';label.textContent=rank.name;card.appendChild(label)});
-const id=activeWeek(),rank=RANKS[id-1],card=cards[id-1],color=colorFor(id,card);stripAnime(document.getElementById('trainingView'));const ui=ensurePanel(grid,id,color);const changed=ui.rank.dataset.id&&ui.rank.dataset.id!==String(id);if(changed){ui.rank.classList.add('is-switching');ui.quote.classList.add('is-switching');setTimeout(()=>{ui.rank.textContent=rank.name;ui.quote.textContent=rank.quote;ui.rank.dataset.id=id;ui.rank.classList.remove('is-switching');ui.quote.classList.remove('is-switching')},220)}else{ui.rank.textContent=rank.name;ui.quote.textContent=rank.quote;ui.rank.dataset.id=id}ui.panel.style.setProperty('--rank-color',color)}
-function boot(){apply();const grid=document.getElementById('weekGrid');if(!grid){const mo=new MutationObserver(()=>{const g=document.getElementById('weekGrid');if(g){mo.disconnect();boot()}});mo.observe(document.body,{childList:true,subtree:true});setTimeout(()=>mo.disconnect(),10000);return}const mo=new MutationObserver(()=>{clearTimeout(boot.t);boot.t=setTimeout(apply,30)});mo.observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});const body=new MutationObserver(()=>{clearTimeout(body.t);body.t=setTimeout(apply,60)});body.observe(document.getElementById('trainingView')||document.body,{childList:true,subtree:true});setTimeout(apply,200);setTimeout(apply,700)}
+function rankFor(n){return RANKS[Math.max(1,Math.min(12,n))-1]}
+function colorFor(n){return COLORS[Math.max(1,Math.min(12,n))-1]}
+function numberFrom(el,index){const explicit=Number(el?.dataset.weekId||el?.dataset.week);if(Number.isInteger(explicit)&&explicit>=1&&explicit<=12)return explicit;const m=(el?.textContent||'').match(/\bWEEK\s*(\d{1,2})\b/i);return m?Number(m[1]):index+1}
+function selectedNumber(grid){const active=grid?.querySelector('.week.active');return numberFrom(active,0)||1}
+
+function removeAnime(root=document.body){
+  if(!root)return;
+  root.querySelectorAll('.btm-character-card,.btm-manga-panel,.btm-week-manga,.btm-silhouette-wrap,.btm-silhouette,.btm-manga-art,.btm-manga-ink,.btm-manga-trace').forEach(el=>el.remove());
+  root.querySelectorAll('.btm-selected-week-panel').forEach(el=>{if(!el.classList.contains('btm-unified-rank-panel'))el.remove()});
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(node=>{let text=node.nodeValue;const original=text;OLD_NAMES.forEach(name=>{text=text.replaceAll(name,'')});OLD_TERMS.forEach(term=>{text=text.replaceAll(term,'ACHIEVEMENT RANK')});if(text!==original)node.nodeValue=text});
+  root.querySelectorAll('img,svg').forEach(el=>{const alt=(el.getAttribute('alt')||'')+' '+(el.getAttribute('aria-label')||'');if(OLD_NAMES.some(n=>alt.toLowerCase().includes(n.toLowerCase())))el.remove()});
+}
+
+function normalizeGrid(grid,mode){
+  if(!grid)return;
+  [...grid.querySelectorAll('.week')].slice(0,12).forEach((card,i)=>{
+    const n=i+1,[rank]=rankFor(n);card.classList.add('btm-unified-rank-week');card.dataset.weekId=n;card.dataset.rank=rank;card.style.setProperty('--rank-color',colorFor(n));
+    const b=card.querySelector('b');if(b)b.textContent='WEEK '+n;
+    const span=card.querySelector('span');if(span)span.textContent=rank;
+    const small=card.querySelector('small');if(small){
+      let detail=(small.textContent||'').replace(/Goku|Tanjiro Kamado|Yuji Itadori|Eren Yeager|Thorfinn|Vegeta|Gojo Satoru|Toji Fushiguro|Ken Kaneki|Itachi Uchiha|Griffith|Guts/gi,'').replace(/·\s*DELOAD/gi,'').trim();
+      if(mode==='training')detail=n===7?'RECOVERY · DELOAD':(n===12?'LEGEND · FINAL RANK':rank+' · '+(detail||'PROGRESSION'));
+      else detail=n===7?'RECOVERY · DELOAD':rank+(detail?' · '+detail:'');
+      small.textContent=detail;
+    }
+  });
+}
+
+function trainingPanel(){
+  const grid=document.getElementById('weekGrid');if(!grid)return;
+  const n=selectedNumber(grid),[rank,quote]=rankFor(n),color=colorFor(n),training=document.getElementById('trainingView');if(!training)return;
+  training.querySelectorAll('.btm-character-card,.btm-selected-week-panel').forEach(el=>el.remove());
+  let panel=training.querySelector('.btm-unified-rank-panel');if(!panel){panel=document.createElement('section');panel.className='btm-unified-rank-panel';grid.closest('.panel')?.insertAdjacentElement('afterend',panel)}
+  panel.style.setProperty('--rank-color',color);const previous=panel.dataset.week;
+  if(previous&&previous!==String(n)){panel.classList.add('is-switching');clearTimeout(panel.__rankTimer);panel.__rankTimer=setTimeout(()=>panel.classList.remove('is-switching'),220)}
+  panel.dataset.week=n;panel.innerHTML='<div class="btm-unified-rank-kicker">ACHIEVEMENT RANK · WEEK '+n+'</div><div class="btm-unified-rank-name">'+rank+'</div><div class="btm-unified-rank-quote">'+quote+'</div>';
+}
+
+function normalizeAll(){removeAnime(document.body);normalizeGrid(document.getElementById('weekGrid'),'training');normalizeGrid(document.getElementById('foodWeeks'),'other');normalizeGrid(document.getElementById('runWeeks'),'other');normalizeGrid(document.getElementById('sleepWeeks'),'other');trainingPanel()}
+function boot(){
+  normalizeAll();
+  const grids=['weekGrid','foodWeeks','runWeeks','sleepWeeks'].map(id=>document.getElementById(id)).filter(Boolean);
+  grids.forEach(grid=>{const mo=new MutationObserver(()=>{clearTimeout(grid.__rankTimer);grid.__rankTimer=setTimeout(()=>{removeAnime(document.body);normalizeGrid(grid,grid.id==='weekGrid'?'training':'other');if(grid.id==='weekGrid')trainingPanel()},25)});mo.observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})});
+  const bodyMo=new MutationObserver(()=>{clearTimeout(bodyMo.__rankTimer);bodyMo.__rankTimer=setTimeout(normalizeAll,45)});bodyMo.observe(document.body,{childList:true,subtree:true});
+  setTimeout(normalizeAll,150);setTimeout(normalizeAll,600);setTimeout(normalizeAll,1500);
+}
+window.BTMWeekRanks={ranks:RANKS,colors:COLORS,update:normalizeAll};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-window.BTMWeekRanks={ranks:RANKS,update:apply};
 })();
