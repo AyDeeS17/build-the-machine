@@ -20,8 +20,7 @@ const WEEKS=[
 ];
 
 const css=`
-/* Week identity is difficulty-driven, not character-driven. */
-.week{--week-color:#6fa8dc;--week-tint:rgba(111,168,220,.075);--week-glow:rgba(111,168,220,.16);--week-label:'EASIEST';position:relative;overflow:hidden!important;background:linear-gradient(135deg,var(--week-tint),rgba(0,0,0,0) 62%),var(--panel2,#13222c)!important;border-color:color-mix(in srgb,var(--week-color) 42%,var(--line,#294656))!important;transition:transform .24s cubic-bezier(.2,.8,.2,1),background .3s ease,border-color .3s ease,box-shadow .3s ease,color .2s ease!important}
+.week{--week-color:#6fa8dc;--week-tint:rgba(111,168,220,.075);--week-glow:rgba(111,168,220,.16);position:relative;overflow:hidden!important;background:linear-gradient(135deg,var(--week-tint),rgba(0,0,0,0) 62%),var(--panel2,#13222c)!important;border-color:color-mix(in srgb,var(--week-color) 42%,var(--line,#294656))!important;transition:transform .24s cubic-bezier(.2,.8,.2,1),background .3s ease,border-color .3s ease,box-shadow .3s ease,color .2s ease!important}
 .week::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,color-mix(in srgb,var(--week-color) 9%,transparent) 50%,transparent 75%);opacity:.35;transform:translateX(-110%);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
 .week:hover::before{transform:translateX(110%)}
 .week b{color:var(--week-color)!important}
@@ -30,7 +29,6 @@ const css=`
 .week.active{background:linear-gradient(135deg,color-mix(in srgb,var(--week-color) 18%,var(--theme-dark,#173247)),var(--panel2,#13222c))!important;border-color:var(--week-color)!important;color:var(--theme-light,#bfeeff)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--week-color) 20%,transparent),0 0 20px var(--week-glow),inset 0 1px 0 rgba(255,255,255,.04)!important}
 .week.active b{color:var(--week-color)!important}
 .week[data-deload="true"]{border-style:dashed!important}
-.week[data-deload="true"]::after{content:'DELOAD';position:absolute;right:7px;top:6px;font:7px 'JetBrains Mono';font-weight:700;letter-spacing:.12em;color:var(--week-color);opacity:.72;pointer-events:none}
 @media(max-width:700px){.week:hover{transform:translateY(-1px)!important}}
 @media(prefers-reduced-motion:reduce){.week,.week::before{transition:none!important}.week:hover{transform:none!important}.week::before{display:none!important}}
 `;
@@ -46,7 +44,6 @@ function applyWeekColors(root=document){
     button.style.setProperty('--week-color',w.color);
     button.style.setProperty('--week-tint',w.tint);
     button.style.setProperty('--week-glow',w.glow);
-    button.style.setProperty('--week-label',`'${w.label}'`);
     button.dataset.weekColor=index+1;
     if(index===6)button.dataset.deload='true';
     else delete button.dataset.deload;
@@ -54,6 +51,13 @@ function applyWeekColors(root=document){
     /* Remove any leftover emblem/logo nodes from older builds. */
     button.querySelectorAll('.btm-week-emblem,.btm-inline-emblem,.btm-emblem,.btm-emblem-panel').forEach(el=>el.remove());
     button.style.removeProperty('padding-right');
+
+    /* Week 7 gets exactly one visible DELOAD label. */
+    const small=button.querySelector('small');
+    if(small){
+      small.textContent=small.textContent.replace(/\s*·\s*DELOAD/gi,'');
+      if(index===6)small.textContent+=' · DELOAD';
+    }
   });
 }
 
