@@ -1,15 +1,2 @@
-/* Edit mode for Smart Food & Macro Calculator entries. */
-(()=>{
-'use strict';
-const STORAGE='btm_food_log_v1';let editingId=null;
-const $=s=>document.querySelector(s),read=()=>{try{return JSON.parse(localStorage.getItem(STORAGE)||'{}')}catch{return{}}},write=v=>localStorage.setItem(STORAGE,JSON.stringify(v));
-const dateKey=()=>{const t=$('#foodTitle')?.textContent||'',m=t.match(/([A-Z]+DAY),?\s+([A-Z]+)\s+(\d+),\s+(\d{4})/i);if(!m)return null;const d=new Date(`${m[2]} ${m[3]}, ${m[4]}`);return Number.isNaN(d.getTime())?null:d.toISOString().slice(0,10)};
-const inputs=()=>{const r=$('#foodMacros'),o={};r?.querySelectorAll('label').forEach(l=>{const t=l.textContent.toLowerCase(),i=l.querySelector('input');if(t.includes('calorie'))o.cal=i;if(t.includes('protein'))o.pro=i;if(t.includes('carbo'))o.carb=i;if(t.includes('fat'))o.fat=i});return o};
-const total=d=>{const b=d.base||{cal:0,pro:0,carb:0,fat:0};return(d.entries||[]).reduce((t,e)=>({cal:t.cal+e.kcal,pro:t.pro+e.pro,carb:t.carb+e.carb,fat:t.fat+e.fat}),{...b})};
-function sync(d){const t=total(d),i=inputs();[['cal',t.cal],['pro',t.pro],['carb',t.carb],['fat',t.fat]].forEach(([k,v])=>{if(i[k]){i[k].value=Math.round(v*10)/10;i[k].dispatchEvent(new Event('input',{bubbles:true}))}});$('#btmFoodSave')?.click()}
-function addEditButtons(){const log=$('#foodCalcLog');if(!log)return;log.querySelectorAll('[data-del]').forEach(b=>{if(b.dataset.editReady)return;b.dataset.editReady='1';const e=document.createElement('button');e.type='button';e.textContent='EDIT';e.dataset.edit=b.dataset.del;b.parentNode.insertBefore(e,b)})}
-function handleEdit(e){const b=e.target.closest('[data-edit]');if(!b)return;const date=dateKey(),d=read()[date],entry=d?.entries?.find(x=>x.id===b.dataset.edit);if(!entry)return;editingId=entry.id;$('#foodCalcSearch').value=entry.name;$('#foodCalcQty').value=entry.qty;$('#foodCalcUnit').value=entry.unit;$('#foodCalcMeal').value=entry.meal||'Dinner';$('#foodCalcAdd').textContent='UPDATE';$('#foodCalcStatus').textContent='Editing '+entry.name+'. Change the quantity/meal, then press UPDATE.';e.preventDefault();e.stopPropagation()}
-function handleUpdate(e){if(!editingId)return;const b=e.target.closest('#foodCalcAdd');if(!b)return;const date=dateKey(),logs=read(),d=logs[date],entry=d?.entries?.find(x=>x.id===editingId);if(!entry)return;const qty=Math.max(.1,parseFloat($('#foodCalcQty').value)||1);const oldQty=Math.max(entry.qty,.1);const factor=qty/oldQty;entry.qty=qty;entry.meal=$('#foodCalcMeal').value;entry.kcal*=factor;entry.pro*=factor;entry.carb*=factor;entry.fat*=factor;write(logs);sync(d);editingId=null;b.textContent='ADD';$('#foodCalcStatus').textContent='Food entry updated and daily totals synced.';e.preventDefault();e.stopImmediatePropagation()}
-function boot(){const o=new MutationObserver(()=>{if(document.body.dataset.section==='food')addEditButtons()});o.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-section']});document.addEventListener('click',handleEdit,true);document.addEventListener('click',handleUpdate,true)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-})();
+/* Compatibility stub. Editing is now owned by food-calculator-v2.js, with no body-wide observer. */
+(()=>{'use strict';window.__BTM_FOOD_EDIT_LEGACY_DISABLED__=true})();
