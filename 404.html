@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build The Machine</title>
+<meta http-equiv="refresh" content="0;url=./index.html">
+<script>
+(function(){
+  var target='./index.html';
+  if(location.pathname.endsWith('/404.html')) target='./index.html';
+  location.replace(target);
+})();
+</script>
+</head>
+<body>
+<script>location.replace('./index.html');</script>
+</body>
+</html>
