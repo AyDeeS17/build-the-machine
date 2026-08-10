@@ -51,6 +51,9 @@ jobs:
           '''
           if 'const moduleView=document.getElementById' not in s:
               s=s.replace('})();',hook+'})();',1)
+          script='<script src="./nav-reorder.js"></script>'
+          if script not in s:
+              s=s.replace('</body>',script+'</body>')
           p.write_text(s)
           PY
       - name: Commit patched site
