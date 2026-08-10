@@ -71,4 +71,10 @@
   cb.onchange=()=>{localStorage.setItem(key,cb.checked?'1':'0');sync()};
   sync();
   deactivate();
+
+  // Allow the persistent navigation on other section pages to open Rules directly.
+  const params=new URLSearchParams(location.search);
+  if(params.get('section')==='rules'){
+    requestAnimationFrame(()=>activate());
+  }
 })();
