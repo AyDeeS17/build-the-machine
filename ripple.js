@@ -1,31 +1,8 @@
-/* Unified UI bootstrap. The interaction stylesheet stays in ripple.css. */
+/* Unified UI bootstrap. */
 (()=>{
-  const syncTraining=()=>{
-    const training=document.getElementById('trainingView');
-    if(training)training.style.display=document.body.dataset.section==='training'?'block':'none';
-  };
-  const installWeekPolish=()=>{
-    const style=document.createElement('style');
-    style.textContent=`
-      #weekGrid .week:nth-child(1){--week-color:#66b9df}#weekGrid .week:nth-child(2){--week-color:#74c7b8}#weekGrid .week:nth-child(3){--week-color:#8ccf70}#weekGrid .week:nth-child(4){--week-color:#b9d45d}#weekGrid .week:nth-child(5){--week-color:#d7bd58}#weekGrid .week:nth-child(6){--week-color:#e09b55}#weekGrid .week:nth-child(7){--week-color:#8d9aa4}#weekGrid .week:nth-child(8){--week-color:#d37a63}#weekGrid .week:nth-child(9){--week-color:#c96879}#weekGrid .week:nth-child(10){--week-color:#a76dc4}#weekGrid .week:nth-child(11){--week-color:#7588d1}#weekGrid .week:nth-child(12){--week-color:#66b9df}
-      #weekGrid .week.active{border-color:var(--week-color)!important;box-shadow:0 0 14px color-mix(in srgb,var(--week-color) 12%,transparent)}
-    `;
-    document.head.appendChild(style);
-    const grid=document.getElementById('weekGrid');
-    if(!grid)return;
-    const difficulties=['Foundation','Foundation+','Build','Build+','Hard','Hard+','Deload','Rebuild','Hard','Hard+','Peak','Machine'];
-    const apply=()=>[...grid.querySelectorAll('.week')].forEach((b,i)=>{const s=b.querySelector('small');if(s&&!s.dataset.difficulty){s.textContent+=' · '+difficulties[i];s.dataset.difficulty='1'}});
-    apply();
-    new MutationObserver(apply).observe(grid,{childList:true,subtree:true});
-  };
-  const load=()=>{
-    if(window.__btmShellLoaded)return;
-    window.__btmShellLoaded=true;
-    const s=document.createElement('script');
-    s.src='./app-shell.js';
-    s.defer=true;
-    s.onload=()=>{syncTraining();installWeekPolish();new MutationObserver(syncTraining).observe(document.body,{attributes:true,attributeFilter:['data-section']})};
-    document.head.appendChild(s);
-  };
+  const syncTraining=()=>{const training=document.getElementById('trainingView');if(training)training.style.display=document.body.dataset.section==='training'?'block':'none'};
+  const installPolish=()=>{if(document.getElementById('btm-polish-link'))return;const link=document.createElement('link');link.id='btm-polish-link';link.rel='stylesheet';link.href='./polish.css';document.head.appendChild(link)};
+  const installWeekPolish=()=>{const style=document.createElement('style');style.textContent=`#weekGrid .week:nth-child(1){--week-color:#66b9df}#weekGrid .week:nth-child(2){--week-color:#74c7b8}#weekGrid .week:nth-child(3){--week-color:#8ccf70}#weekGrid .week:nth-child(4){--week-color:#b9d45d}#weekGrid .week:nth-child(5){--week-color:#d7bd58}#weekGrid .week:nth-child(6){--week-color:#e09b55}#weekGrid .week:nth-child(7){--week-color:#8d9aa4}#weekGrid .week:nth-child(8){--week-color:#d37a63}#weekGrid .week:nth-child(9){--week-color:#c96879}#weekGrid .week:nth-child(10){--week-color:#a76dc4}#weekGrid .week:nth-child(11){--week-color:#7588d1}#weekGrid .week:nth-child(12){--week-color:#66b9df}#weekGrid .week.active{border-color:var(--week-color)!important;box-shadow:0 0 14px color-mix(in srgb,var(--week-color) 12%,transparent)}`;document.head.appendChild(style);const grid=document.getElementById('weekGrid');if(!grid)return;const difficulties=['Foundation','Foundation+','Build','Build+','Hard','Hard+','Deload','Rebuild','Hard','Hard+','Peak','Machine'];const apply=()=>[...grid.querySelectorAll('.week')].forEach((b,i)=>{const s=b.querySelector('small');if(s&&!s.dataset.difficulty){s.textContent+=' · '+difficulties[i];s.dataset.difficulty='1'}});apply();new MutationObserver(apply).observe(grid,{childList:true,subtree:true})};
+  const load=()=>{if(window.__btmShellLoaded)return;window.__btmShellLoaded=true;installPolish();const s=document.createElement('script');s.src='./app-shell.js';s.defer=true;s.onload=()=>{syncTraining();installWeekPolish();new MutationObserver(syncTraining).observe(document.body,{attributes:true,attributeFilter:['data-section']})};document.head.appendChild(s)};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});else load();
 })();
