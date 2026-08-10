@@ -17,6 +17,7 @@ jobs:
           node --check rules.js
           node --check enhancements.js
           node --check ui-polish.js
+          node --check training-readability.js
       - name: Check navigation contract
         run: |
           grep -q 'id="trainingBtn"' index.html
@@ -30,6 +31,14 @@ jobs:
         run: |
           grep -q 'ACTIVE_DAYS=new Set(\[0,2,4\])' running-polish.js
           grep -q 'btm_running_non_training_backup_v1' running-polish.js
+      - name: Check training readability layer
+        run: |
+          grep -q 'training-prescription' training-readability.js
+          grep -q 'training-rir' training-readability.js
+      - name: Check reset controller stays observer-free
+        run: |
+          ! grep -q 'MutationObserver' rules.js
+          ! grep -q 'Safe day/week reset controls' enhancements.js
       - name: Check removed MACHINE effects stay removed
         run: |
           ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
