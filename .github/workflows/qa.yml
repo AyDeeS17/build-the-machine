@@ -10,15 +10,21 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check JavaScript syntax
         run: |
+          node --check app.js
           node --check app-shell.js
           node --check ripple.js
           node --check running-polish.js
           node --check nav-reorder.js
           node --check rules.js
-          node --check enhancements.js
           node --check ui-polish.js
           node --check training-readability.js
           node --check reset-ui-cleanup.js
+      - name: Check Week configuration
+        run: |
+          node --check week-config.js
+          grep -q "rank: 'NOVICE'" week-config.js
+          grep -q "rank: 'LEGEND'" week-config.js
+          grep -q "id: 7, rank: 'RECOVERY'.*isDeload: true" week-config.js
       - name: Check navigation contract
         run: |
           grep -q 'id="trainingBtn"' index.html
@@ -46,3 +52,6 @@ jobs:
       - name: Check removed MACHINE effects stay removed
         run: |
           ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
+      - name: Check legacy character system is gone
+        run: |
+          ! grep -RniE 'Goku|Tanjiro Kamado|Yuji Itadori|Eren Yeager|Thorfinn|Vegeta|Gojo Satoru|Toji Fushiguro|Ken Kaneki|Itachi Uchiha|Griffith|Guts|ANIME PROGRESSION|ANIME CHARACTER|MANGA PROGRESSION' --exclude-dir=.git .
