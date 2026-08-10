@@ -18,6 +18,7 @@ jobs:
           node --check enhancements.js
           node --check ui-polish.js
           node --check training-readability.js
+          node --check reset-ui-cleanup.js
       - name: Check navigation contract
         run: |
           grep -q 'id="trainingBtn"' index.html
@@ -35,10 +36,13 @@ jobs:
         run: |
           grep -q 'training-prescription' training-readability.js
           grep -q 'training-rir' training-readability.js
-      - name: Check reset controller stays observer-free
+      - name: Check reset UI contract
         run: |
-          ! grep -q 'MutationObserver' rules.js
-          ! grep -q 'Safe day/week reset controls' enhancements.js
+          grep -q 'btm-universal-reset' rules.js
+          grep -q 'btmResetHeat' rules.js
+          grep -q 'section.*rules.*progress\|s===.rules.\|s===.progress.' rules.js
+          grep -q 'resetWeekBtn' reset-ui-cleanup.js
+          grep -q 'btm-inline-emblem' reset-ui-cleanup.js
       - name: Check removed MACHINE effects stay removed
         run: |
           ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
