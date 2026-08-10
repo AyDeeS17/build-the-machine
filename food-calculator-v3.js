@@ -1,61 +1,196 @@
 (()=>{
 'use strict';
-if(window.__BTM_NUTRITION_MANUAL__) return;
-window.__BTM_NUTRITION_MANUAL__=1;
+if(window.__BTM_NUTRITION_MANUAL_V5__) return;
+window.__BTM_NUTRITION_MANUAL_V5__=1;
+
 const START=new Date('2026-08-10T00:00:00');
-const FOOD_TARGETS=[{carb:300,fat:70},{carb:300,fat:70},{carb:310,fat:70},{carb:310,fat:70},{carb:320,fat:72},{carb:320,fat:72},{carb:270,fat:68},{carb:320,fat:72},{carb:330,fat:72},{carb:330,fat:73},{carb:340,fat:74},{carb:340,fat:75}];
-const STORAGE='btm_nutrition_manual_v4';
-const LEGACY='btm_nutrition_unified';
-const DRAFTS='btm_nutrition_drafts';
-const read=(k,d={})=>{try{const raw=localStorage.getItem(k);return raw?JSON.parse(raw):d}catch{return d}};
-const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
+const TARGETS={calMin:1800,calMax:2000,proMin:130,proMax:160,carb:300,fat:70,water:2};
+const STORAGE='btm_nutrition_manual_v5';
+const LEGACY_KEYS=['btm_nutrition_manual_v4','btm_nutrition_unified','build_machine_food_v2','btm_nutrition_v2','btm_nutrition_84'];
 const $=id=>document.getElementById(id);
+const read=(k,d={})=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}};
+const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
 const iso=d=>d.toISOString().slice(0,10);
 const dateFor=(w,d)=>{const x=new Date(START);x.setDate(x.getDate()+(w-1)*7+d);return x};
-let foodWeek=1,foodDay=0;
-const key=()=>iso(dateFor(foodWeek,foodDay));
-const normalise=v=>({cal:Number(v?.cal)||0,pro:Number(v?.pro)||0,carb:Number(v?.carb)||0,fat:Number(v?.fat)||0,water:Number(v?.water)||0,meals:String(v?.meals??''),items:String(v?.items??''),complete:!!v?.complete});
-function migrateStorage(){
-  const existing=read(STORAGE,null);
-  if(existing&&typeof existing==='object') return existing;
-  const legacy=read(LEGACY,{}),oldBuild=read('build_machine_food_v2',{}),oldV2=read('btm_nutrition_v2',{}),old84=read('btm_nutrition_84',{}),merged={};
-  const merge=(source,mapper)=>Object.entries(source||{}).forEach(([k,v])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(k))return;merged[k]={...(merged[k]||{}),...mapper(v)}});
-  merge(oldBuild,v=>normalise(v));
-  merge(oldV2,v=>normalise(v));
-  merge(old84,v=>normalise({cal:v?.cal,pro:v?.protein,carb:v?.carbs,fat:v?.fats,water:v?.water,meals:v?.meals,items:v?.items,complete:v?.complete}));
-  merge(legacy,v=>normalise(v));
-  write(STORAGE,merged);
-  return merged;
-}
-const official=()=>migrateStorage();
-const drafts=()=>read(DRAFTS,{});
-const target=w=>({cal:2000,pro:160,carb:FOOD_TARGETS[w-1].carb,fat:FOOD_TARGETS[w-1].fat});
-const ensureDay=()=>official()[key()]||{cal:0,pro:0,carb:0,fat:0,water:0,meals:'',items:'',complete:false};
-const draftFor=()=>{const d=drafts(),k=key(),o=ensureDay();return d[k]||{cal:o.cal||'',pro:o.pro||'',carb:o.carb||'',fat:o.fat||'',water:o.water??''}};
-const pct=(v,t)=>Math.max(0,Math.min(100,Math.round((Number(v)||0)/(t||1)*100)));
+const dayKey=(w,d)=>iso(dateFor(w,d));
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function syncSelection(){const wb=$('foodWeeks')?.querySelector('.week.active');const db=$('foodDays')?.querySelector('.day.active');const wm=(wb?.textContent||'').match(/WEEK\s*(\d+)/i);if(wm)foodWeek=Math.max(1,Math.min(12,+wm[1]));if(db){const days=[...($('foodDays')?.children||[])];const idx=days.indexOf(db);if(idx>=0)foodDay=idx}}
-function weekCompleted(w){const d=official();for(let i=0;i<7;i++)if(!d[iso(dateFor(w,i))]?.complete)return false;return true}
-function weekCount(w){const d=official();let n=0;for(let i=0;i<7;i++)if(d[iso(dateFor(w,i))]?.complete)n++;return n}
-function totalCompleted(){const d=official();let n=0;for(let w=1;w<=12;w++)for(let i=0;i<7;i++)if(d[iso(dateFor(w,i))]?.complete)n++;return n}
-function removeCalculator(){document.querySelectorAll('.btm-food-calc,#btm-food-calc,.food-calculator,.food-log,.food-suggest,.manual-fields,.food-mode,.food-add-row').forEach(el=>el.remove())}
-function injectStyle(){if($('btm-manual-nutrition-style'))return;const s=document.createElement('style');s.id='btm-manual-nutrition-style';s.textContent=`#btm-food-view .btm-manual-wrap{margin-top:12px}.btm-manual-panel{padding:18px;border:1px solid var(--line,#294656);border-radius:9px;background:linear-gradient(145deg,#13202a,#0d161d)}.btm-manual-title{font:22px Anton,sans-serif;text-transform:uppercase;margin:0 0 5px}.btm-manual-date{font:10px 'JetBrains Mono';color:var(--muted,#8195a3);letter-spacing:.08em;margin-bottom:16px}.btm-manual-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.btm-manual-field label{display:block;color:var(--muted,#8195a3);font:9px 'JetBrains Mono';margin-bottom:6px;text-transform:uppercase}.btm-manual-field input{width:100%;background:#09131a;border:1px solid var(--line,#294656);color:var(--text,#e8f0f4);border-radius:6px;padding:12px;font:14px 'JetBrains Mono';outline:none;transition:border-color .2s,box-shadow .2s}.btm-manual-field input:focus{border-color:var(--blue,#66b9df);box-shadow:0 0 0 2px rgba(102,185,223,.12)}.btm-water-row{margin-top:12px;max-width:260px}.btm-water-row input{margin-top:6px}.btm-manual-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.btm-macro{padding:11px;border:1px solid var(--line,#294656);border-radius:7px;background:#0b151c}.btm-macro-head{display:flex;justify-content:space-between;gap:8px;font:10px 'JetBrains Mono';color:var(--muted,#8195a3)}.btm-macro-head strong{color:var(--text,#e8f0f4);font-size:11px}.btm-macro-bar{height:4px;background:#20313b;border-radius:4px;overflow:hidden;margin-top:8px}.btm-macro-bar i{display:block;height:100%;background:var(--blue,#66b9df);transition:width .2s ease}.btm-water-progress{margin-top:12px;padding:11px;border:1px solid var(--line,#294656);border-radius:7px;background:#0b151c;font:11px 'JetBrains Mono';color:var(--muted,#8195a3);transition:border-color .25s,box-shadow .25s,color .25s}.btm-water-progress.reached{border-color:rgba(91,190,116,.55);color:#9de2ab;box-shadow:0 0 14px rgba(91,190,116,.08)}.btm-water-bar{height:4px;background:#20313b;border-radius:4px;overflow:hidden;margin-top:8px}.btm-water-bar i{display:block;height:100%;background:#66b9df;transition:width .2s ease}.btm-water-progress.reached .btm-water-bar i{background:#5bbe74}.btm-action-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.btm-actions{display:flex;gap:10px;align-items:center}.btm-save-day,.btm-complete-day{cursor:pointer;border-radius:6px;padding:11px 18px;font:10px 'JetBrains Mono';font-weight:700;min-width:120px;transition:transform .15s,background .25s,border-color .25s,box-shadow .25s}.btm-save-day{background:var(--blue,#66b9df);color:#071016;border:1px solid var(--blue,#66b9df)}.btm-complete-day{background:rgba(91,190,116,.1);color:#9de2ab;border:1px solid rgba(91,190,116,.55)}.btm-complete-day:hover{background:rgba(91,190,116,.18);box-shadow:0 0 14px rgba(91,190,116,.1)}.btm-save-day:active,.btm-complete-day:active{transform:translateY(1px)}.btm-saved{font:9px 'JetBrains Mono';color:#9bd8ef;opacity:0;transform:translateY(2px);transition:opacity .25s,transform .25s}.btm-saved.show{opacity:1;transform:translateY(0)}.btm-week-progress{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line,#294656);font:10px 'JetBrains Mono';color:var(--muted,#8195a3)}.btm-week-progress strong{color:var(--text,#e8f0f4)}.btm-overall-progress{margin-top:8px;font:9px 'JetBrains Mono';color:var(--muted,#8195a3)}.btm-complete-day.completed{background:rgba(91,190,116,.18);color:#b7efc1;border-color:#5bbe74}.btm-day-complete{background:rgba(91,190,116,.13)!important;border-color:rgba(91,190,116,.65)!important;box-shadow:0 0 12px rgba(91,190,116,.08)}.btm-day-complete::after{content:' ✓';color:#79d68e}.btm-week-complete{background:rgba(91,190,116,.13)!important;border-color:rgba(91,190,116,.65)!important;box-shadow:0 0 12px rgba(91,190,116,.08)}.btm-week-complete::after{content:' ✓';color:#79d68e}@media(max-width:800px){.btm-manual-grid,.btm-manual-progress{grid-template-columns:1fr 1fr}.btm-action-row{align-items:flex-start}.btm-actions{flex-wrap:wrap}}@media(max-width:500px){.btm-manual-grid,.btm-manual-progress{grid-template-columns:1fr}.btm-action-row{flex-direction:column}.btm-actions{width:100%}.btm-save-day,.btm-complete-day{flex:1}.btm-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}}`;document.head.appendChild(s)}
-function targetsFromExisting(w){const el=$('foodTargets');if(el){const text=el.textContent||'';const nums=text.match(/\d+(?:[.,]\d+)?/g)||[];if(nums.length>=6)return{cal:Number(nums[1]),pro:Number(nums[3]),carb:Number(nums[4]),fat:Number(nums[5])}}return target(w)}
-function markSelectors(){const days=$('foodDays');if(days)[...days.children].forEach((b,i)=>{const done=!!official()[iso(dateFor(foodWeek,i))]?.complete;b.classList.toggle('btm-day-complete',done)});const weeks=$('foodWeeks');if(weeks)[...weeks.children].forEach((b,i)=>b.classList.toggle('btm-week-complete',weekCompleted(i+1)))}
-function render(){removeCalculator();const view=$('btm-food-view');if(!view)return;syncSelection();injectStyle();markSelectors();const old=view.querySelector('.btm-manual-wrap');if(old)old.remove();view.querySelectorAll('.btm-hero').forEach(el=>el.style.display='none');const panels=[...view.querySelectorAll(':scope>.panel')];panels.forEach((p,i)=>{p.style.display=(i===0)?'block':'none'});const timeline=panels[0];if(!timeline)return;const wrap=document.createElement('div');wrap.className='btm-manual-wrap';const t=targetsFromExisting(foodWeek),v=draftFor(),saved=official()[key()]||{};wrap.innerHTML=`<div class="btm-manual-panel"><div class="ey">DAILY NUTRITION</div><h2 class="btm-manual-title">MANUAL MACROS</h2><div class="btm-manual-date">${esc(dateFor(foodWeek,foodDay).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).toUpperCase())}</div><div class="btm-manual-grid"><div class="btm-manual-field"><label>Calories, kcal</label><input id="manualCal" type="number" min="0" step="1" value="${esc(v.cal)}"></div><div class="btm-manual-field"><label>Protein, g</label><input id="manualPro" type="number" min="0" step="0.1" value="${esc(v.pro)}"></div><div class="btm-manual-field"><label>Carbs, g</label><input id="manualCarb" type="number" min="0" step="0.1" value="${esc(v.carb)}"></div><div class="btm-manual-field"><label>Fats, g</label><input id="manualFat" type="number" min="0" step="0.1" value="${esc(v.fat)}"></div></div><div class="btm-water-row btm-manual-field"><label>Water, liters</label><input id="manualWater" type="number" min="0" step="0.1" placeholder="2.0" value="${esc(v.water)}"></div><div class="btm-manual-progress" id="manualProgress"></div><div class="btm-water-progress" id="waterProgress"></div><div class="btm-action-row"><div class="btm-actions"><button class="btm-save-day" id="manualSaveDay">SAVE DAY</button><button class="btm-complete-day${saved.complete?' completed':''}" id="manualCompleteDay">${saved.complete?'✓ COMPLETED':'COMPLETE'}</button></div><span class="btm-saved${saved.cal!==undefined||saved.pro!==undefined?' show':''}" id="manualSaved">✓ SAVED</span></div><div class="btm-week-progress"><span>WEEK ${foodWeek} COMPLETION</span><strong id="weekCompletion">${weekCount(foodWeek)} / 7 DAYS</strong></div><div class="btm-overall-progress">12-WEEK NUTRITION COMPLETION, <strong id="overallCompletion">${totalCompleted()} / 84 DAYS</strong></div></div>`;timeline.insertAdjacentElement('afterend',wrap);
-const fields={cal:$('manualCal'),pro:$('manualPro'),carb:$('manualCarb'),fat:$('manualFat'),water:$('manualWater')};
-function updateProgress(){const p=$('manualProgress'),vals={cal:fields.cal.value,pro:fields.pro.value,carb:fields.carb.value,fat:fields.fat.value};p.innerHTML=[['Calories',vals.cal,t.cal,' kcal'],['Protein',vals.pro,t.pro,'g'],['Carbs',vals.carb,t.carb,'g'],['Fats',vals.fat,t.fat,'g']].map(([n,v,target,unit])=>`<div class="btm-macro"><div class="btm-macro-head"><strong>${n}</strong><span>${esc(v||0)} / ${target}${unit}</span></div><div class="btm-macro-bar"><i style="width:${pct(v,target)}%"></i></div></div>`).join('');const water=Number(fields.water.value)||0,wp=$('waterProgress');wp.classList.toggle('reached',water>=2);wp.innerHTML=`<div>💧 WATER: <strong>${water.toFixed(1)} / 2.0 L</strong>${water>=2?' · ✓ TARGET REACHED':''}</div><div class="btm-water-bar"><i style="width:${pct(water,2)}%"></i></div>`}
-function updateDraft(){const d=drafts();d[key()]={cal:fields.cal.value,pro:fields.pro.value,carb:fields.carb.value,fat:fields.fat.value,water:fields.water.value};write(DRAFTS,d);updateProgress()}
-Object.values(fields).forEach(i=>i.addEventListener('input',updateDraft));
-function saveCurrent(complete){const all=official(),k=key(),x={...ensureDay()};x.cal=Number(fields.cal.value)||0;x.pro=Number(fields.pro.value)||0;x.carb=Number(fields.carb.value)||0;x.fat=Number(fields.fat.value)||0;x.water=Number(fields.water.value)||0;if(complete)x.complete=true;all[k]=normalise(x);write(STORAGE,all);write(LEGACY,all);const d=drafts();delete d[k];write(DRAFTS,d);return all[k]}
-$('manualSaveDay').onclick=()=>{saveCurrent(false);const status=$('manualSaved');status.classList.remove('show');requestAnimationFrame(()=>status.classList.add('show'));$('manualCompleteDay').classList.toggle('completed',!!official()[key()]?.complete);$('manualCompleteDay').textContent=official()[key()]?.complete?'✓ COMPLETED':'COMPLETE';markSelectors();$('weekCompletion').textContent=weekCount(foodWeek)+' / 7 DAYS';$('overallCompletion').textContent=totalCompleted()+' / 84 DAYS'};
-$('manualCompleteDay').onclick=()=>{saveCurrent(true);const btn=$('manualCompleteDay');btn.classList.add('completed');btn.textContent='✓ COMPLETED';const status=$('manualSaved');status.classList.add('show');markSelectors();$('weekCompletion').textContent=weekCount(foodWeek)+' / 7 DAYS';$('overallCompletion').textContent=totalCompleted()+' / 84 DAYS'};
-updateProgress();markSelectors()}
-function nutritionCompletionPercent(w){return Math.round(weekCount(w)/7*100)}
-function syncOverallProgress(){if(document.body.dataset.section!=='progress')return;const table=$('overallTable');if(!table)return;const rows=[...table.querySelectorAll('tr')].slice(1);const vals=[];rows.forEach((row,idx)=>{const cells=row.querySelectorAll('td');if(cells.length<6)return;const w=idx+1,n=nutritionCompletionPercent(w);cells[3].textContent=n+'%';const tr=parseFloat(cells[1].textContent)||0,run=parseFloat(cells[2].textContent)||0,sleep=parseFloat(cells[4].textContent)||0,overall=Math.round(tr*.35+run*.2+n*.25+sleep*.2);cells[5].innerHTML='<b>'+overall+'%</b>';vals.push(overall)});const overall=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;if($('overallPercent'))$('overallPercent').textContent=overall+'%';if($('overallBar'))$('overallBar').style.width=overall+'%';const kpis=$('overallKpis');if(kpis){const cards=[...kpis.querySelectorAll('.btm-kpi')],nutrition=totalCompleted();cards.forEach(card=>{const label=card.querySelector('span')?.textContent||'';if(label==='Nutrition days')card.querySelector('b').textContent=nutrition})}}
-function boot(){const view=$('btm-food-view');if(!view){setTimeout(boot,150);return}const observer=new MutationObserver(()=>{if(document.body.dataset.section==='food'&&!view.querySelector('.btm-manual-wrap'))render();else if(document.body.dataset.section==='food')markSelectors()});observer.observe(view,{childList:true,subtree:true});const globalObserver=new MutationObserver(()=>{if(document.body.dataset.section==='progress')setTimeout(syncOverallProgress,0)});globalObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-section']});render();window.BTMNutritionRefresh=render;
-  const persistDrafts=()=>{try{const d=drafts();const wrap=document.querySelector('.btm-manual-wrap');if(!wrap)return;const f={cal:$('manualCal')?.value??'',pro:$('manualPro')?.value??'',carb:$('manualCarb')?.value??'',fat:$('manualFat')?.value??'',water:$('manualWater')?.value??''};d[key()]=f;write(DRAFTS,d)}catch{}};
-  window.addEventListener('pagehide',persistDrafts,{once:false});
+const empty=()=>({cal:'',pro:'',carb:'',fat:'',water:'',meals:'',items:'',saved:false,complete:false});
+const normalise=v=>{v=v||{};const hasValues=['cal','pro','carb','fat','water','meals','items'].some(k=>v[k]!==undefined&&v[k]!==null&&String(v[k])!=='');return {cal:v.cal??'',pro:v.pro??v.protein??'',carb:v.carb??v.carbs??'',fat:v.fat??v.fats??'',water:v.water??'',meals:String(v.meals??''),items:String(v.items??''),saved:('saved' in v)?!!v.saved:hasValues,complete:('complete' in v)?!!v.complete:(v.completed==='yes'||v.completed===true)};};
+
+let week=1,day=0;
+
+function migrate(){
+  const current=read(STORAGE,null);
+  if(current&&typeof current==='object') return current;
+  const out={};
+  for(const storageKey of LEGACY_KEYS){
+    const source=read(storageKey,{});
+    Object.entries(source||{}).forEach(([k,v])=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      const incoming=normalise(v);
+      const previous=out[k]||empty();
+      out[k]={
+        ...previous,
+        ...incoming,
+        saved:previous.saved||incoming.saved,
+        complete:previous.complete||incoming.complete
+      };
+    });
+  }
+  write(STORAGE,out);
+  return out;
+}
+function data(){return migrate()}
+function get(w=week,d=day){return data()[dayKey(w,d)]||empty()}
+function put(w,d,value){const all=data();all[dayKey(w,d)]={...empty(),...value};write(STORAGE,all);syncLegacy(all);return all[dayKey(w,d)]}
+function syncLegacy(all){
+  // Keep the existing dashboard's aggregate reader in sync, without using it as the source of truth.
+  const unified={};
+  Object.entries(all).forEach(([k,v])=>{unified[k]={cal:Number(v.cal)||0,pro:Number(v.pro)||0,carb:Number(v.carb)||0,fat:Number(v.fat)||0,water:Number(v.water)||0,meals:v.meals||'',items:v.items||'',complete:!!v.complete,saved:!!v.saved}});
+  write('btm_nutrition_unified',unified);
+}
+function removeOldUI(){
+  document.querySelectorAll('.btm-food-calc,#btm-food-calc,.food-calculator,.food-log,.food-suggest,.manual-fields,.food-mode,.food-add-row').forEach(el=>el.remove());
+}
+function statusFor(v){if(v.complete)return '<span class="nut-status complete">✓ COMPLETED</span>';if(v.saved)return '<span class="nut-status logged">✓ LOGGED</span>';return '<span class="nut-status empty">EMPTY</span>'}
+function rangeState(v,min,max){const n=Number(v);if(!Number.isFinite(n)||n===0)return 'empty';if(n<min)return 'below';if(n>max)return 'above';return 'target'}
+function exactState(v,target){const n=Number(v);if(!Number.isFinite(n)||n===0)return 'empty';if(n===target)return 'target';return n<target?'below':'above'}
+function stateText(kind,v){if(kind==='cal'){const s=rangeState(v,TARGETS.calMin,TARGETS.calMax);return s==='target'?'TARGET RANGE':s==='below'?'BELOW TARGET':s==='above'?'ABOVE TARGET':'NOT LOGGED'}if(kind==='pro'){const s=rangeState(v,TARGETS.proMin,TARGETS.proMax);return s==='target'?'TARGET RANGE':s==='below'?'BELOW TARGET':s==='above'?'ABOVE TARGET':'NOT LOGGED'}const s=exactState(v,TARGETS[kind]);return s==='target'?'TARGET REACHED':s==='below'?'BELOW TARGET':s==='above'?'ABOVE TARGET':'NOT LOGGED'}
+function pct(v,target){return Math.max(0,Math.min(100,Math.round((Number(v)||0)/target*100)))}
+
+function injectStyle(){
+  if($('btm-nutrition-v5-style'))return;
+  const s=document.createElement('style');s.id='btm-nutrition-v5-style';s.textContent=`
+#btm-food-view .btm-v5-wrap{margin-top:14px}
+.btm-v5-panel{padding:18px;border:1px solid var(--line,#294656);border-radius:10px;background:linear-gradient(145deg,#13202a,#0d161d)}
+.btm-v5-targets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.btm-v5-target{padding:18px 12px;text-align:center;border:1px solid var(--line,#294656);border-radius:9px;background:linear-gradient(145deg,#162936,#0b151c);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.btm-v5-target-value{display:block;color:var(--blue,#66b9df);font:clamp(28px,4vw,46px)/.95 Anton,sans-serif;letter-spacing:.01em;white-space:nowrap}
+.btm-v5-target-label{display:block;margin-top:9px;color:var(--muted,#8195a3);font:10px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase}
+.btm-v5-sub{margin:0 0 15px;color:var(--muted,#8195a3);font:10px 'JetBrains Mono';letter-spacing:.05em}
+.btm-v5-weeks,.btm-v5-days{display:grid;gap:8px}.btm-v5-weeks{grid-template-columns:repeat(6,1fr)}.btm-v5-days{grid-template-columns:repeat(7,1fr);margin-top:10px}
+.btm-v5-week,.btm-v5-day{cursor:pointer;color:var(--muted,#8195a3);background:#0b151c;border:1px solid var(--line,#294656);border-radius:7px;padding:11px 9px;text-align:left;font-family:'JetBrains Mono';transition:border-color .2s,background .2s,box-shadow .2s,transform .15s}.btm-v5-week:hover,.btm-v5-day:hover{transform:translateY(-1px)}
+.btm-v5-week.active,.btm-v5-day.active{background:#173247;border-color:var(--blue,#66b9df);color:#e8f0f4}.btm-v5-week b,.btm-v5-day b{display:block;color:var(--blue,#66b9df);font-size:12px}.btm-v5-week span{display:block;margin-top:5px;font:12px 'Barlow Condensed';color:var(--text,#e8f0f4)}.btm-v5-week small,.btm-v5-day small{display:block;margin-top:6px;font-size:8px}.btm-v5-day.logged{border-color:rgba(102,185,223,.55);background:rgba(102,185,223,.07)}.btm-v5-day.complete{border-color:#5bbe74;background:rgba(91,190,116,.14);box-shadow:0 0 14px rgba(91,190,116,.08);color:#b7efc1}.btm-v5-day.complete b,.btm-v5-day.logged b{color:#9de2ab}.btm-v5-week.complete{border-color:#5bbe74;background:rgba(91,190,116,.12)}
+.nut-status{display:inline-block;font:9px 'JetBrains Mono';font-weight:700;letter-spacing:.04em}.nut-status.logged{color:#9bd8ef}.nut-status.complete{color:#8ee19b}.nut-status.empty{color:#687d89}
+.btm-v5-date{margin-bottom:14px;color:var(--muted,#8195a3);font:10px 'JetBrains Mono';letter-spacing:.08em}.btm-v5-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.btm-v5-field label{display:block;margin-bottom:6px;color:var(--muted,#8195a3);font:9px 'JetBrains Mono';text-transform:uppercase}.btm-v5-field input,.btm-v5-field textarea{width:100%;background:#09131a;border:1px solid var(--line,#294656);color:var(--text,#e8f0f4);border-radius:6px;padding:11px;font:14px 'JetBrains Mono';outline:none}.btm-v5-field input:focus,.btm-v5-field textarea:focus{border-color:var(--blue,#66b9df);box-shadow:0 0 0 2px rgba(102,185,223,.12)}.btm-v5-water{max-width:260px;margin-top:12px}.btm-v5-text{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.btm-v5-text textarea{min-height:80px;resize:vertical}
+.btm-v5-statusline{display:flex;align-items:center;gap:10px;margin-top:14px;padding:11px 13px;border:1px solid var(--line,#294656);border-radius:7px;background:#0b151c}.btm-v5-statusline strong{font:11px 'JetBrains Mono'}.btm-v5-statusline.logged{border-color:rgba(102,185,223,.45)}.btm-v5-statusline.complete{border-color:rgba(91,190,116,.65);background:rgba(91,190,116,.08)}
+.btm-v5-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.btm-v5-macro{padding:11px;border:1px solid var(--line,#294656);border-radius:7px;background:#0b151c}.btm-v5-macro-head{display:flex;justify-content:space-between;gap:6px;font:9px 'JetBrains Mono';color:var(--muted,#8195a3)}.btm-v5-macro-head strong{color:var(--text,#e8f0f4);font-size:10px}.btm-v5-macro-state{display:block;margin-top:5px;font:8px 'JetBrains Mono';font-weight:700}.btm-v5-macro-state.target{color:#8ee19b}.btm-v5-macro-state.below,.btm-v5-macro-state.above{color:#d9a56e}.btm-v5-macro-state.empty{color:#687d89}.btm-v5-bar{height:4px;margin-top:8px;background:#20313b;border-radius:4px;overflow:hidden}.btm-v5-bar i{display:block;height:100%;background:var(--blue,#66b9df)}
+.btm-v5-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:16px}.btm-v5-btn{cursor:pointer;border-radius:6px;padding:11px 16px;font:10px 'JetBrains Mono';font-weight:700}.btm-v5-save{background:var(--blue,#66b9df);color:#071016;border:1px solid var(--blue,#66b9df)}.btm-v5-complete{background:rgba(91,190,116,.1);color:#9de2ab;border:1px solid rgba(91,190,116,.55)}.btm-v5-complete.is-complete{background:#5bbe74;color:#071016;border-color:#5bbe74}.btm-v5-reset{margin-left:auto;background:#21171a;color:#d6a29a;border:1px solid rgba(187,83,67,.58)}.btm-v5-save:hover,.btm-v5-complete:hover,.btm-v5-reset:hover{filter:brightness(1.12)}
+.btm-v5-progress{display:flex;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line,#294656);color:var(--muted,#8195a3);font:9px 'JetBrains Mono'}.btm-v5-progress strong{color:var(--text,#e8f0f4)}
+.btm-v5-modal-backdrop{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,7,10,.78);backdrop-filter:blur(5px)}.btm-v5-modal{width:min(430px,100%);padding:22px;border:1px solid #3b6073;border-radius:10px;background:linear-gradient(145deg,#162832,#0b1217);box-shadow:0 24px 80px rgba(0,0,0,.55)}.btm-v5-modal h3{margin:0 0 7px;font:26px Anton;text-transform:uppercase}.btm-v5-modal p{margin:0;color:var(--muted,#8195a3);font:13px/1.45 'Barlow Condensed'}.btm-v5-modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.btm-v5-modal button{cursor:pointer;padding:10px 15px;border-radius:5px;font:10px 'JetBrains Mono';font-weight:700}.btm-v5-cancel{background:#0b151c;color:#b9c8d0;border:1px solid var(--line)}.btm-v5-confirm{background:#a94d45;color:#fff;border:1px solid #c86b61}
+@media(max-width:900px){.btm-v5-weeks{grid-template-columns:repeat(4,1fr)}.btm-v5-days{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:800px){.btm-v5-targets,.btm-v5-fields,.btm-v5-macros{grid-template-columns:1fr 1fr}.btm-v5-text{grid-template-columns:1fr}.btm-v5-reset{margin-left:0}}
+@media(max-width:500px){.btm-v5-targets{grid-template-columns:1fr 1fr}.btm-v5-weeks{grid-template-columns:repeat(2,1fr)}.btm-v5-days{grid-template-columns:repeat(2,1fr)}.btm-v5-fields,.btm-v5-macros{grid-template-columns:1fr}.btm-v5-actions>*{flex:1}.btm-v5-reset{flex-basis:100%}}
+`;
+  document.head.appendChild(s);
+}
+
+function render(){
+  const view=$('btm-food-view');if(!view)return;
+  injectStyle();removeOldUI();
+  const old=view.querySelector('.btm-v5-wrap');if(old)old.remove();
+  view.querySelectorAll('.btm-hero').forEach(x=>x.style.display='none');
+  const panels=[...view.querySelectorAll(':scope>.panel')];panels.forEach(p=>p.style.display='none');
+  const wrap=document.createElement('div');wrap.className='btm-v5-wrap';
+  const current=get();
+  wrap.innerHTML=`
+    <div class="btm-v5-panel">
+      <div class="ey">DAILY TARGETS</div>
+      <div class="btm-v5-targets">
+        <div class="btm-v5-target"><span class="btm-v5-target-value">1,800–2,000</span><span class="btm-v5-target-label">CALORIES / KCAL</span></div>
+        <div class="btm-v5-target"><span class="btm-v5-target-value">130–160g</span><span class="btm-v5-target-label">PROTEIN</span></div>
+        <div class="btm-v5-target"><span class="btm-v5-target-value">300g</span><span class="btm-v5-target-label">CARBS</span></div>
+        <div class="btm-v5-target"><span class="btm-v5-target-value">70g</span><span class="btm-v5-target-label">FATS</span></div>
+      </div>
+      <p class="btm-v5-sub">Daily targets are fixed across all 12 weeks. Calories and protein are target ranges.</p>
+      <div class="ey">12-WEEK NUTRITION TIMELINE</div>
+      <h2>SELECT A WEEK</h2>
+      <div id="btmV5Weeks" class="btm-v5-weeks"></div>
+      <div id="btmV5Days" class="btm-v5-days"></div>
+    </div>
+    <div class="btm-v5-panel" style="margin-top:12px">
+      <div class="ey">SELECTED DAY</div>
+      <h2 id="btmV5Title"></h2>
+      <div class="btm-v5-date" id="btmV5Date"></div>
+      <div id="btmV5StatusLine" class="btm-v5-statusline"></div>
+      <div class="btm-v5-fields" style="margin-top:14px">
+        <div class="btm-v5-field"><label>Calories, kcal</label><input id="btmV5Cal" type="number" min="0" step="1"></div>
+        <div class="btm-v5-field"><label>Protein, g</label><input id="btmV5Pro" type="number" min="0" step="0.1"></div>
+        <div class="btm-v5-field"><label>Carbs, g</label><input id="btmV5Carb" type="number" min="0" step="0.1"></div>
+        <div class="btm-v5-field"><label>Fats, g</label><input id="btmV5Fat" type="number" min="0" step="0.1"></div>
+      </div>
+      <div class="btm-v5-field btm-v5-water"><label>Water, liters</label><input id="btmV5Water" type="number" min="0" step="0.1" placeholder="2.0"></div>
+      <div class="btm-v5-text"><div class="btm-v5-field"><label>Meals</label><textarea id="btmV5Meals"></textarea></div><div class="btm-v5-field"><label>Food consumed</label><textarea id="btmV5Items"></textarea></div></div>
+      <div id="btmV5Macros" class="btm-v5-macros"></div>
+      <div class="btm-v5-actions"><button class="btm-v5-btn btm-v5-save" id="btmV5Save">SAVE / LOG</button><button class="btm-v5-btn btm-v5-complete" id="btmV5Complete">COMPLETE DAY</button><button class="btm-v5-btn btm-v5-reset" id="btmV5Reset">RESET DATA</button></div>
+      <div class="btm-v5-progress"><span>WEEK ${week} COMPLETION</span><strong id="btmV5WeekProgress"></strong></div>
+      <div class="btm-v5-progress"><span>12-WEEK NUTRITION COMPLETION</span><strong id="btmV5OverallProgress"></strong></div>
+    </div>`;
+  view.appendChild(wrap);
+  bind();populate(current);
+}
+
+function populate(v){
+  const d=dateFor(week,day);
+  $('btmV5Title').textContent=`WEEK ${week} · DAY ${day+1}`;
+  $('btmV5Date').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+  $('btmV5Cal').value=v.cal;$('btmV5Pro').value=v.pro;$('btmV5Carb').value=v.carb;$('btmV5Fat').value=v.fat;$('btmV5Water').value=v.water;$('btmV5Meals').value=v.meals;$('btmV5Items').value=v.items;
+  const line=$('btmV5StatusLine');line.className='btm-v5-statusline '+(v.complete?'complete':v.saved?'logged':'');line.innerHTML=v.complete?'<strong class="nut-status complete">✓ COMPLETED</strong><span class="note">Saved + completed, persistent</span>':v.saved?'<strong class="nut-status logged">✓ LOGGED</strong><span class="note">Saved, not completed</span>':'<strong class="nut-status empty">EMPTY</strong><span class="note">Nothing saved for this day</span>';
+  $('btmV5Complete').textContent=v.complete?'✓ COMPLETED':'COMPLETE DAY';$('btmV5Complete').classList.toggle('is-complete',v.complete);
+  updateMacroUI(v);renderSelectors();updateProgressLabels();
+}
+function updateMacroUI(v){
+  const rows=[['Calories','cal',v.cal,'1,800–2,000 kcal',rangeState(v.cal,TARGETS.calMin,TARGETS.calMax),TARGETS.calMax],['Protein','pro',v.pro,'130–160 g',rangeState(v.pro,TARGETS.proMin,TARGETS.proMax),TARGETS.proMax],['Carbs','carb',v.carb,'300 g',exactState(v.carb,TARGETS.carb),TARGETS.carb],['Fats','fat',v.fat,'70 g',exactState(v.fat,TARGETS.fat),TARGETS.fat]];
+  $('btmV5Macros').innerHTML=rows.map(r=>`<div class="btm-v5-macro"><div class="btm-v5-macro-head"><strong>${r[0]}</strong><span>${esc(r[2]||0)} / ${r[3]}</span></div><span class="btm-v5-macro-state ${r[4]}">${stateText(r[1],r[2])}</span><div class="btm-v5-bar"><i style="width:${pct(r[2],r[5])}%"></i></div></div>`).join('');
+}
+function renderSelectors(){
+  const weeks=$('btmV5Weeks'),days=$('btmV5Days'),all=data();
+  weeks.innerHTML='';
+  for(let w=1;w<=12;w++){
+    const completed=Array.from({length:7},(_,d)=>!!all[dayKey(w,d)]?.complete).filter(Boolean).length;
+    const b=document.createElement('button');b.type='button';b.className='btm-v5-week'+(w===week?' active':'')+(completed===7?' complete':'');b.innerHTML=`<b>WEEK ${w}</b><span>${['The Beginning','Steady Steps','Building Strength','Breaking Limits','True Resilience','Pride & Power','Recover & Reset','Back To Work','Embrace The Pain','Discipline & Control','Ascension','The Machine'][w-1]}</span><small>${completed}/7 COMPLETE</small>`;b.onclick=()=>{week=w;day=0;render()};weeks.appendChild(b);
+  }
+  days.innerHTML='';
+  for(let d=0;d<7;d++){
+    const v=all[dayKey(week,d)]||empty(),b=document.createElement('button');b.type='button';b.className='btm-v5-day'+(d===day?' active ':' ')+(v.complete?'complete':v.saved?'logged':'');
+    const label=dateFor(week,d).toLocaleDateString('en-US',{weekday:'short'}).toUpperCase();
+    b.innerHTML=`<b>${label}</b><small>${dateFor(week,d).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</small><small>${statusFor(v)}</small>`;b.onclick=()=>{day=d;render()};days.appendChild(b);
+  }
+}
+function updateProgressLabels(){
+  const all=data();let wc=0,total=0;
+  for(let w=1;w<=12;w++)for(let d=0;d<7;d++){if(all[dayKey(w,d)]?.complete){total++;if(w===week)wc++}}
+  $('btmV5WeekProgress').textContent=`${wc} / 7 DAYS`;$('btmV5OverallProgress').textContent=`${total} / 84 DAYS`;
+}
+function bind(){
+  const fields=['Cal','Pro','Carb','Fat','Water','Meals','Items'];
+  fields.forEach(x=>$("btmV5"+x).addEventListener('input',()=>{const v=get();updateMacroUI({...v,cal:$('btmV5Cal').value,pro:$('btmV5Pro').value,carb:$('btmV5Carb').value,fat:$('btmV5Fat').value});}));
+  $('btmV5Save').onclick=()=>{
+    const old=get();const next={...old,cal:$('btmV5Cal').value,pro:$('btmV5Pro').value,carb:$('btmV5Carb').value,fat:$('btmV5Fat').value,water:$('btmV5Water').value,meals:$('btmV5Meals').value,items:$('btmV5Items').value,saved:true,complete:!!old.complete};
+    put(week,day,next);render();
+  };
+  $('btmV5Complete').onclick=()=>{
+    const old=get();const next={...old,cal:$('btmV5Cal').value,pro:$('btmV5Pro').value,carb:$('btmV5Carb').value,fat:$('btmV5Fat').value,water:$('btmV5Water').value,meals:$('btmV5Meals').value,items:$('btmV5Items').value,saved:true,complete:true};
+    put(week,day,next);render();
+  };
+  $('btmV5Reset').onclick=()=>showReset();
+}
+function showReset(){
+  const d=dateFor(week,day),name=d.toLocaleDateString('en-US',{weekday:'long'});
+  document.querySelector('.btm-v5-modal-backdrop')?.remove();
+  const back=document.createElement('div');back.className='btm-v5-modal-backdrop';back.innerHTML=`<div class="btm-v5-modal"><h3>Reset ${esc(name)}?</h3><p>This will erase all Nutrition data and completion status for this day.</p><div class="btm-v5-modal-actions"><button class="btm-v5-cancel">CANCEL</button><button class="btm-v5-confirm">RESET</button></div></div>`;document.body.appendChild(back);
+  back.querySelector('.btm-v5-cancel').onclick=()=>back.remove();back.querySelector('.btm-v5-confirm').onclick=()=>{const all=data();delete all[dayKey(week,day)];write(STORAGE,all);syncLegacy(all);back.remove();render()};back.addEventListener('click',e=>{if(e.target===back)back.remove()});
+}
+function hookNavigation(){
+  const foodBtn=$('foodBtn');if(foodBtn&&!foodBtn.dataset.nutritionV5Hook){foodBtn.dataset.nutritionV5Hook='1';foodBtn.addEventListener('click',()=>setTimeout(render,0),true)}
+  const observer=new MutationObserver(()=>{if($('btm-food-view')){injectStyle();if(document.body.dataset.section==='food')render()}});observer.observe(document.body,{childList:true,subtree:true});
+}
+function boot(){
+  injectStyle();
+  const view=$('btm-food-view');
+  if(view)render();
+  hookNavigation();
+  window.addEventListener('pageshow',()=>{if(document.body.dataset.section==='food')render()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
