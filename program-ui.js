@@ -57,4 +57,6 @@ function boot(){
   setTimeout(()=>observer.disconnect(),8000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+
+const nutritionLoader=document.createElement('script');nutritionLoader.src='./food-calculator-v3.js';nutritionLoader.defer=true;document.head.appendChild(nutritionLoader);
 })();
