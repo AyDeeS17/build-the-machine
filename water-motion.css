@@ -1,0 +1,54 @@
+/* Build The Machine, subtle water-motion interaction layer. Visual-only, no layout changes. */
+:root{--water-blue:#66b9df;--water-cyan:#74c7df;--water-soft:rgba(102,185,223,.12)}
+
+/* Calm ambient surface, kept deliberately slow and low-contrast. */
+body::after{background:linear-gradient(180deg,rgba(4,13,19,.60),rgba(4,13,19,.88)),linear-gradient(105deg,rgba(35,112,153,.08),transparent 42%,rgba(102,185,223,.08));background-size:100% 100%,220% 100%;animation:btm-water-drift 24s ease-in-out infinite alternate;transition:opacity .55s ease}
+@keyframes btm-water-drift{0%{background-position:0 0,0% 50%}100%{background-position:0 0,100% 50%}}
+
+/* A very faint moving sheen sits behind the main application surface. */
+.wrap{position:relative;isolation:isolate}
+.wrap::before{content:"";position:fixed;inset:-18%;z-index:-1;pointer-events:none;opacity:.20;background:radial-gradient(ellipse at 20% 45%,rgba(102,185,223,.07),transparent 28%),radial-gradient(ellipse at 78% 60%,rgba(79,174,159,.045),transparent 30%);filter:blur(22px);transform:translate3d(-2%,0,0);animation:btm-water-current 30s ease-in-out infinite alternate}
+@keyframes btm-water-current{0%{transform:translate3d(-2%,0,0) scale(1)}50%{transform:translate3d(2%,-1%,0) scale(1.02)}100%{transform:translate3d(-1%,1%,0) scale(1.01)}}
+
+/* Fluid section arrival, preserving the existing active/display logic. */
+.btm-section.active{animation:btm-water-section-in .42s cubic-bezier(.2,.75,.2,1) both}
+@keyframes btm-water-section-in{0%{opacity:0;transform:translate3d(0,10px,0);filter:blur(2px)}65%{opacity:1;transform:translate3d(0,-1px,0);filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+
+/* Interactive surfaces. Transforms do not alter layout flow. */
+.btm-nav .btn,.btm-week-grid .week,.btm-day-grid .day,.feel button,.save,.reset-week,.btm-target,.btm-kpi,.stat,.exercise,.btm-rules-grid article,.btm-character-card,.btm-input-grid input,.btm-text-grid textarea{position:relative;overflow:hidden;transition:transform .24s cubic-bezier(.2,.8,.2,1),background-color .24s ease,border-color .24s ease,box-shadow .28s ease,color .2s ease,filter .24s ease!important}
+.btm-nav .btn:hover,.btm-week-grid .week:hover,.btm-day-grid .day:hover,.feel button:hover,.save:hover,.reset-week:hover,.btm-target:hover,.btm-kpi:hover,.stat:hover,.exercise:hover,.btm-rules-grid article:hover,.btm-character-card:hover,.btm-input-grid input:hover,.btm-text-grid textarea:hover{transform:translate3d(0,-2px,0)!important}
+
+/* Soft waterline highlight. */
+.btm-nav .btn::before,.btm-week-grid .week::before,.btm-day-grid .day::before,.feel button::before,.save::before,.reset-week::before,.btm-target::before,.btm-kpi::before,.stat::before,.exercise::before,.btm-rules-grid article::before,.btm-character-card::before,.btm-input-grid input::before,.btm-text-grid textarea::before{content:"";position:absolute;inset:-45% -20%;pointer-events:none;background:linear-gradient(112deg,transparent 35%,rgba(255,255,255,.055) 48%,transparent 60%);transform:translateX(-70%) rotate(.001deg);opacity:0;transition:transform .65s cubic-bezier(.2,.7,.2,1),opacity .3s ease}
+.btm-nav .btn:hover::before,.btm-week-grid .week:hover::before,.btm-day-grid .day:hover::before,.feel button:hover::before,.save:hover::before,.reset-week:hover::before,.btm-target:hover::before,.btm-kpi:hover::before,.stat:hover::before,.exercise:hover::before,.btm-rules-grid article:hover::before,.btm-character-card:hover::before,.btm-input-grid input:hover::before,.btm-text-grid textarea:hover::before{transform:translateX(70%) rotate(.001deg);opacity:1}
+
+/* Small expanding ripple impression, intentionally faint and non-blocking. */
+.btm-nav .btn::after,.btm-week-grid .week::after,.btm-day-grid .day::after,.feel button::after,.save::after,.reset-week::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid rgba(142,216,240,.38);border-radius:50%;transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none}
+.btm-nav .btn:active::after,.btm-week-grid .week:active::after,.btm-day-grid .day:active::after,.feel button:active::after,.save:active::after,.reset-week:active::after{animation:btm-water-ripple .52s ease-out both}
+@keyframes btm-water-ripple{0%{opacity:.5;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(15)}}
+
+/* Ambient progress breathing, restrained enough to stay behind the data. */
+.btm-progress-bar i{animation:btm-water-breathe 4.5s ease-in-out infinite alternate}
+@keyframes btm-water-breathe{from{filter:brightness(.96);box-shadow:0 0 5px rgba(79,174,159,.05)}to{filter:brightness(1.06);box-shadow:0 0 12px rgba(79,174,159,.12)}}
+.btm-meter i{animation:btm-meter-flow 5s ease-in-out infinite alternate}
+@keyframes btm-meter-flow{from{filter:brightness(.96)}to{filter:brightness(1.05)}}
+
+/* Inputs feel like a smooth surface being touched, without moving layout. */
+.btm-input-grid input:focus,.btm-text-grid textarea:focus{transform:translate3d(0,-1px,0)!important;box-shadow:0 0 0 2px rgba(102,185,223,.055),0 0 18px rgba(102,185,223,.08)!important}
+
+/* Keep active controls stable, with emphasis instead of scale. */
+.btm-nav .btn.active,.btm-week-grid .week.active,.btm-day-grid .day.active{transform:none!important;box-shadow:0 0 0 1px rgba(102,185,223,.12),0 0 20px rgba(102,185,223,.10),inset 0 1px 0 rgba(255,255,255,.035)}
+.btm-day-grid .day.complete{box-shadow:inset 0 0 18px rgba(79,174,159,.035)}
+
+/* Respect users who request reduced motion. */
+@media(prefers-reduced-motion:reduce){
+  body::after,.wrap::before,.btm-progress-bar i,.btm-meter i{animation:none!important}
+  .btm-section.active{animation:none!important;filter:none!important}
+  .btm-nav .btn,.btm-week-grid .week,.btm-day-grid .day,.feel button,.save,.reset-week,.btm-target,.btm-kpi,.stat,.exercise,.btm-rules-grid article,.btm-character-card,.btm-input-grid input,.btm-text-grid textarea{transition:none!important}
+  .btm-nav .btn::before,.btm-week-grid .week::before,.btm-day-grid .day::before,.feel button::before,.save::before,.reset-week::before,.btm-target::before,.btm-kpi::before,.stat::before,.exercise::before,.btm-rules-grid article::before,.btm-character-card::before,.btm-input-grid input::before,.btm-text-grid textarea::before{display:none!important}
+}
+
+@media(max-width:700px){
+  .wrap::before{opacity:.13;filter:blur(18px)}
+  .btm-nav .btn:hover,.btm-week-grid .week:hover,.btm-day-grid .day:hover,.feel button:hover,.save:hover,.reset-week:hover,.btm-target:hover,.btm-kpi:hover,.stat:hover,.exercise:hover,.btm-rules-grid article:hover,.btm-character-card:hover,.btm-input-grid input:hover,.btm-text-grid textarea:hover{transform:translate3d(0,-1px,0)!important}
+}
