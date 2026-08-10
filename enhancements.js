@@ -1,43 +1,77 @@
-/* Canonical character-linked emblem system, performance-safe and event-driven. */
+/* Build The Machine, Week difficulty color system. Character emblem/artwork system retired. */
 (()=>{
 'use strict';
-if(window.__BTM_CANONICAL_EMBLEMS__)return;
-window.__BTM_CANONICAL_EMBLEMS__=1;
+if(window.__BTM_WEEK_COLOR_SYSTEM__)return;
+window.__BTM_WEEK_COLOR_SYSTEM__=1;
 
-const WEEK_COLORS=['#66b9df','#e86a78','#b58cff','#7ec8a0','#d6a45d','#d6c36a','#8c82d8','#e58b5b','#6fb8d6','#a879d6','#c98b58','#d05b68'];
-
-/*
-  The marks below are deliberately tied to the assigned characters rather than invented
-  "character-like" logos. They are simplified vector redraws of canonical symbols,
-  marks, insignia, abilities, or iconic objects associated with each character.
-*/
-const EMBLEMS=[
- {name:'Kame / Turtle School',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M42 25c-7 5-11 11-11 18 0 5 3 9 8 12l-5 13c-2 5 1 9 6 9 5 0 8-3 10-8l4-12 4 12c2 5 5 8 10 8 5 0 8-4 6-9l-5-13c5-3 8-7 8-12 0-7-4-13-11-18-4 5-8 7-12 7s-8-2-12-7z"/><path d="M42 51h16M50 43v16"/></svg>`},
- {name:'Tanjiro Hanafuda Earring',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M50 16v68"/><path d="M50 17c-8 12-19 18-30 22 12 2 23 8 30 18-3-12-3-25 0-40z"/><path d="M50 17c8 12 19 18 30 22-12 2-23 8-30 18 3-12 3-25 0-40z"/><path d="M50 55c-7 10-7 19 0 29 7-10 7-19 0-29z"/><path d="M25 28c4 5 7 8 11 10M75 28c-4 5-7 8-11 10"/></svg>`},
- {name:'Sukuna Finger',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M39 78c-5-4-7-10-6-16l9-39c1-7 5-11 10-10 5 1 7 5 6 11l-4 20 6-5c4-3 8-2 10 2 2 4 0 8-3 11L57 62c-3 3-4 7-2 11l2 5c2 5 0 9-4 11-5 2-10-1-14-6z"/><path d="M46 31l8 2M44 40l8 2M42 49l8 2"/></svg>`},
- {name:'Wings of Freedom',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M50 84C42 65 29 49 12 39c14 1 27 7 37 18-5-15-8-28-7-39 8 10 14 22 17 35 3-13 9-25 17-35 1 11-2 24-7 39 10-11 23-17 37-18-17 10-30 26-39 45z"/></svg>`},
- {name:'Thorfinn Twin Daggers',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M29 18l12 7-8 38-10 17-4-18zM71 18l-12 7 8 38 10 17 4-18z"/><path d="M21 61h22M57 61h22"/><path d="M29 18l12 7M71 18l-12 7"/></svg>`},
- {name:'Majin Mark',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M22 31c8-8 18-9 28 0 10-9 20-8 28 0-5 6-8 12-9 21-1 12-8 23-19 30-11-7-18-18-19-30-1-9-4-15-9-21z"/><path d="M35 37c4 5 9 8 15 9 6-1 11-4 15-9"/></svg>`},
- {name:'Six Eyes',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M9 50Q20 34 31 50 20 66 9 50zM69 50Q80 34 91 50 80 66 69 50z"/><circle cx="20" cy="50" r="5"/><circle cx="80" cy="50" r="5"/><path d="M20 40v-7M20 67v-7M80 40v-7M80 67v-7"/></svg>`},
- {name:'Inverted Spear of Heaven',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M50 86V24"/><path d="M50 15c-8 7-12 13-12 20 4-2 8-3 12-3s8 1 12 3c0-7-4-13-12-20z"/><path d="M41 38l9 8 9-8M41 51l9 8 9-8"/><path d="M44 86h12"/></svg>`},
- {name:'Kaneki Ghoul Mask',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M25 25q25-16 50 0l-3 48-22 14-22-14z"/><path d="M29 45h15M56 45h15"/><circle cx="39" cy="41" r="4"/><circle cx="61" cy="41" r="4"/><path d="M34 60c10 8 22 8 32 0M45 28l5 7 5-7"/><path d="M32 67l-5 8M68 67l5 8"/></svg>`},
- {name:'Uchiha Clan Crest',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M29 38a21 21 0 0 1 42 0v8H29z"/><path d="M29 46h42v35H29z"/><path d="M42 46h16v35H42z"/></svg>`},
- {name:'Band of the Hawk',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M17 69c16-10 27-25 34-48 7 12 10 24 8 36 10-13 21-21 34-26-7 17-20 31-37 39-14 6-27 6-39-1z"/><path d="M25 74q26 8 53-10"/></svg>`},
- {name:'Brand of Sacrifice',svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="emblem-ring" cx="50" cy="50" r="39"/><path d="M50 12v76M19 29l62 42M81 29L19 71"/><path d="M19 29l22 7M81 29L59 36M19 71l22-7M81 71L59 64"/></svg>`}
+const WEEKS=[
+  {color:'#6fa8dc',tint:'rgba(111,168,220,.075)',glow:'rgba(111,168,220,.16)',label:'EASIEST'},
+  {color:'#62aee0',tint:'rgba(98,174,224,.085)',glow:'rgba(98,174,224,.17)',label:'VERY EASY'},
+  {color:'#5d9fe5',tint:'rgba(93,159,229,.095)',glow:'rgba(93,159,229,.18)',label:'EASY'},
+  {color:'#6d88e4',tint:'rgba(109,136,228,.105)',glow:'rgba(109,136,228,.19)',label:'BUILDING'},
+  {color:'#866fdf',tint:'rgba(134,111,223,.115)',glow:'rgba(134,111,223,.20)',label:'MODERATE'},
+  {color:'#a05ed2',tint:'rgba(160,94,210,.125)',glow:'rgba(160,94,210,.22)',label:'HARD'},
+  {color:'#718592',tint:'rgba(113,133,146,.09)',glow:'rgba(113,133,146,.14)',label:'DELOAD'},
+  {color:'#b967a1',tint:'rgba(185,103,161,.14)',glow:'rgba(185,103,161,.24)',label:'HARD'},
+  {color:'#d05f83',tint:'rgba(208,95,131,.15)',glow:'rgba(208,95,131,.25)',label:'VERY HARD'},
+  {color:'#df5368',tint:'rgba(223,83,104,.16)',glow:'rgba(223,83,104,.27)',label:'INTENSE'},
+  {color:'#e94858',tint:'rgba(233,72,88,.175)',glow:'rgba(233,72,88,.29)',label:'VERY INTENSE'},
+  {color:'#ef3d4d',tint:'rgba(239,61,77,.19)',glow:'rgba(239,61,77,.32)',label:'HARDEST'}
 ];
 
 const css=`
-.btm-character-card{--emblem-color:#66b9df}.btm-character-copy{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0}.btm-character-copy .btm-inline-emblem{position:absolute;right:18px;top:50%;width:58px;height:58px;transform:translateY(-50%);color:var(--emblem-color);opacity:.92;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--emblem-color) 28%,transparent));pointer-events:none}.btm-inline-emblem svg,.btm-emblem svg,.btm-week-emblem svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.btm-inline-emblem .emblem-ring,.btm-emblem .emblem-ring,.btm-week-emblem .emblem-ring{stroke-width:3;opacity:.82}.btm-character-card .btm-emblem-panel{--emblem-color:#66b9df;position:relative;display:flex;align-items:center;justify-content:center;min-height:150px;border:1px solid color-mix(in srgb,var(--emblem-color) 42%,#294656);border-radius:8px;background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--emblem-color) 18%,transparent),transparent 58%),#09141b;overflow:hidden}.btm-character-card .btm-emblem-panel:before{content:'';position:absolute;inset:10px;border:1px solid color-mix(in srgb,var(--emblem-color) 18%,transparent);border-radius:6px;pointer-events:none}.btm-emblem{width:104px;height:104px;display:grid;place-items:center;color:var(--emblem-color);filter:drop-shadow(0 0 14px color-mix(in srgb,var(--emblem-color) 30%,transparent));transition:transform .28s ease,filter .28s ease,opacity .28s ease}.btm-emblem-label{position:absolute;left:14px;bottom:11px;font:8px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--emblem-color) 70%,#8195a3)}.btm-emblem-panel:hover .btm-emblem{transform:translateY(-3px) scale(1.035);filter:drop-shadow(0 0 20px color-mix(in srgb,var(--emblem-color) 48%,transparent))}.btm-week-emblem{position:absolute;right:10px;top:50%;width:42px;height:42px;transform:translateY(-50%);display:grid;place-items:center;color:var(--emblem-color,#66b9df);opacity:.76;transition:transform .25s ease,opacity .25s ease,filter .25s ease}.week{position:relative;padding-right:60px}.week:hover .btm-week-emblem,.week.active .btm-week-emblem{opacity:1;transform:translateY(-50%) scale(1.08);filter:drop-shadow(0 0 10px color-mix(in srgb,var(--emblem-color,#66b9df) 42%,transparent))}.btm-character-card .btm-emblem-panel .btm-emblem{animation:btmEmblemIn .32s ease both}@keyframes btmEmblemIn{from{opacity:0;transform:translateY(5px) scale(.94)}to{opacity:1;transform:none}}@media(max-width:700px){.btm-character-copy .btm-inline-emblem{width:44px;height:44px;right:10px}.btm-emblem{width:82px;height:82px}.btm-week-emblem{width:34px;height:34px;right:8px}.week{padding-right:50px}}@media(prefers-reduced-motion:reduce){.btm-emblem,.btm-week-emblem{transition:none!important;animation:none!important}}
+/* Week identity is difficulty-driven, not character-driven. */
+.week{--week-color:#6fa8dc;--week-tint:rgba(111,168,220,.075);--week-glow:rgba(111,168,220,.16);--week-label:'EASIEST';position:relative;overflow:hidden!important;background:linear-gradient(135deg,var(--week-tint),rgba(0,0,0,0) 62%),var(--panel2,#13222c)!important;border-color:color-mix(in srgb,var(--week-color) 42%,var(--line,#294656))!important;transition:transform .24s cubic-bezier(.2,.8,.2,1),background .3s ease,border-color .3s ease,box-shadow .3s ease,color .2s ease!important}
+.week::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,color-mix(in srgb,var(--week-color) 9%,transparent) 50%,transparent 75%);opacity:.35;transform:translateX(-110%);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.week:hover::before{transform:translateX(110%)}
+.week b{color:var(--week-color)!important}
+.week small{color:color-mix(in srgb,var(--week-color) 55%,#687d89)!important}
+.week:hover{border-color:var(--week-color)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--week-color) 12%,transparent),0 0 18px var(--week-glow)!important;transform:translateY(-2px)!important}
+.week.active{background:linear-gradient(135deg,color-mix(in srgb,var(--week-color) 18%,var(--theme-dark,#173247)),var(--panel2,#13222c))!important;border-color:var(--week-color)!important;color:var(--theme-light,#bfeeff)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--week-color) 20%,transparent),0 0 20px var(--week-glow),inset 0 1px 0 rgba(255,255,255,.04)!important}
+.week.active b{color:var(--week-color)!important}
+.week[data-deload="true"]{border-style:dashed!important}
+.week[data-deload="true"]::after{content:'DELOAD';position:absolute;right:7px;top:6px;font:7px 'JetBrains Mono';font-weight:700;letter-spacing:.12em;color:var(--week-color);opacity:.72;pointer-events:none}
+@media(max-width:700px){.week:hover{transform:translateY(-1px)!important}}
+@media(prefers-reduced-motion:reduce){.week,.week::before{transition:none!important}.week:hover{transform:none!important}.week::before{display:none!important}}
 `;
-if(!document.getElementById('btm-character-emblem-style')){const style=document.createElement('style');style.id='btm-character-emblem-style';style.textContent=css;document.head.appendChild(style)}
 
-function setColor(el,index){if(el)el.style.setProperty('--emblem-color',WEEK_COLORS[index]||WEEK_COLORS[0])}
-function activeIndex(grid){const buttons=[...grid.querySelectorAll('.week')];const i=buttons.findIndex(b=>b.classList.contains('active'));return i<0?0:i}
-function decorateWeekButtons(grid){if(!grid)return;grid.querySelectorAll('.week').forEach((button,index)=>{setColor(button,index);let icon=button.querySelector('.btm-week-emblem');if(!icon){icon=document.createElement('span');icon.className='btm-week-emblem';icon.setAttribute('aria-hidden','true');button.appendChild(icon)}icon.innerHTML=EMBLEMS[index]?.svg||EMBLEMS[0].svg;setColor(icon,index)})}
-function updateCharacterCard(card,grid){const idx=activeIndex(grid);decorateWeekButtons(grid);const inline=card?.querySelector('.btm-inline-emblem');if(inline){inline.innerHTML=EMBLEMS[idx].svg;setColor(inline,idx)}const panel=card?.querySelector('#btm-selected-emblem-panel');if(panel){const current=panel.querySelector('.btm-emblem');if(current){current.innerHTML=EMBLEMS[idx].svg;current.title=EMBLEMS[idx].name;current.setAttribute('aria-label',EMBLEMS[idx].name)}setColor(panel,idx);let label=panel.querySelector('.btm-emblem-label');if(label)label.textContent=EMBLEMS[idx].name}}
-function patchCharacterCard(){const card=document.getElementById('btm-character-card'),grid=document.getElementById('weekGrid');if(!card||!grid)return false;const wrap=card.querySelector('.btm-silhouette-wrap');if(wrap){const copy=card.firstElementChild;if(copy&&!copy.querySelector('.btm-inline-emblem')){copy.classList.add('btm-character-copy');const inline=document.createElement('span');inline.className='btm-inline-emblem';inline.setAttribute('aria-hidden','true');copy.appendChild(inline)}const idx=activeIndex(grid);const right=document.createElement('div');right.className='btm-emblem-panel';right.id='btm-selected-emblem-panel';right.innerHTML=`<span class="btm-emblem" title="${EMBLEMS[idx].name}" aria-label="${EMBLEMS[idx].name}">${EMBLEMS[idx].svg}</span><span class="btm-emblem-label">${EMBLEMS[idx].name}</span>`;setColor(right,idx);wrap.replaceWith(right)}updateCharacterCard(card,grid);return true}
+const style=document.createElement('style');
+style.id='btm-week-color-style';
+style.textContent=css;
+document.head.appendChild(style);
 
-function bind(){const grid=document.getElementById('weekGrid');if(!grid)return false;const card=document.getElementById('btm-character-card');decorateWeekButtons(grid);if(card)patchCharacterCard();if(!grid.__btmCanonicalEmblemClick){grid.addEventListener('click',()=>{requestAnimationFrame(()=>{const current=document.getElementById('btm-character-card');if(current)updateCharacterCard(current,grid);else decorateWeekButtons(grid)})});grid.__btmCanonicalEmblemClick=true}return true}
-function boot(){bind()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+function applyWeekColors(root=document){
+  root.querySelectorAll('.week').forEach((button,index)=>{
+    const w=WEEKS[index]||WEEKS[0];
+    button.style.setProperty('--week-color',w.color);
+    button.style.setProperty('--week-tint',w.tint);
+    button.style.setProperty('--week-glow',w.glow);
+    button.style.setProperty('--week-label',`'${w.label}'`);
+    button.dataset.weekColor=index+1;
+    if(index===6)button.dataset.deload='true';
+    else delete button.dataset.deload;
+
+    /* Remove any leftover emblem/logo nodes from older builds. */
+    button.querySelectorAll('.btm-week-emblem,.btm-inline-emblem,.btm-emblem,.btm-emblem-panel').forEach(el=>el.remove());
+    button.style.removeProperty('padding-right');
+  });
+}
+
+function boot(){
+  applyWeekColors(document);
+  const observer=new MutationObserver(mutations=>{
+    let changed=false;
+    for(const m of mutations){
+      if(m.type==='childList' && (m.addedNodes.length||m.removedNodes.length)){changed=true;break}
+      if(m.type==='attributes' && m.attributeName==='class'){changed=true;break}
+    }
+    if(changed)applyWeekColors(document);
+  });
+  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
+
+window.BTMWeekColors={weeks:WEEKS,apply:applyWeekColors};
 })();
