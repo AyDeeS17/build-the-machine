@@ -1,0 +1,12 @@
+/* Pixel-art companions for the 12-week selector. */
+#weekGrid .week{position:relative;overflow:hidden;padding-right:68px;isolation:isolate}
+#weekGrid .week::after{content:"";position:absolute;right:9px;top:50%;width:1px;height:46px;transform:translateY(-50%);background:linear-gradient(180deg,transparent,rgba(102,185,223,.14),transparent);pointer-events:none}
+.btm-week-pixel{position:absolute;right:7px;bottom:6px;width:50px;height:58px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;z-index:2;filter:drop-shadow(0 0 7px rgba(102,185,223,.08));transform:translateZ(0);transition:transform .24s cubic-bezier(.2,.8,.2,1),filter .24s ease,opacity .24s ease}
+.btm-week-pixel svg{width:100%;height:100%;image-rendering:pixelated;shape-rendering:crispEdges;overflow:visible}
+.btm-week-pixel .px{transition:opacity .2s ease}
+#weekGrid .week:hover .btm-week-pixel{transform:translateY(-2px) scale(1.045);filter:drop-shadow(0 0 9px color-mix(in srgb,var(--week-color,#66b9df) 22%,transparent)) brightness(1.08)}
+#weekGrid .week.active .btm-week-pixel{filter:drop-shadow(0 0 9px color-mix(in srgb,var(--week-color,#66b9df) 18%,transparent))}
+.btm-week-pixel::after{content:"";position:absolute;left:9px;right:9px;bottom:0;height:2px;border-radius:99px;background:var(--week-color,#66b9df);opacity:.28;box-shadow:0 0 7px var(--week-color,#66b9df)}
+@media(max-width:900px){#weekGrid .week{padding-right:58px}.btm-week-pixel{width:43px;height:51px;right:5px;bottom:5px}}
+@media(max-width:600px){#weekGrid .week{padding-right:54px}.btm-week-pixel{width:39px;height:47px;right:4px}.btm-week-pixel::after{left:7px;right:7px}}
+@media(prefers-reduced-motion:reduce){.btm-week-pixel,#weekGrid .week:hover .btm-week-pixel{transition:none;transform:none}.btm-week-pixel::after{box-shadow:none}}
