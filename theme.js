@@ -33,7 +33,9 @@ header{border-color:var(--line)!important}
 h1 span,.ey,.banner h2,.stat b,.nav-icon{color:var(--theme-primary)!important}
 .nav,.panel,.stat{background:linear-gradient(145deg,var(--panel),var(--panel2))!important;border-color:var(--line)!important}
 .btn,.week,.feel button{background:var(--panel2)!important;border-color:var(--line)!important;color:var(--muted)!important}
-.btn.active,.week.active,.feel button.active{background:var(--theme-dark)!important;border-color:var(--theme-primary)!important;color:var(--theme-light)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--theme-primary) 12%,transparent),0 0 18px var(--theme-glow)}
+.btn.active,.week.active,.feel button.active{background:var(--theme-dark)!important;color:var(--theme-light)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--theme-primary) 12%,transparent),0 0 18px var(--theme-glow)}
+.btn.active{border-color:var(--theme-primary)!important}
+.week.active{border-color:var(--week-color,var(--theme-primary))!important}
 .btn:hover,.week:hover,.feel button:hover{border-color:var(--theme-primary)!important;color:var(--theme-light)!important;box-shadow:0 0 14px var(--theme-glow)}
 .exercise{background:linear-gradient(145deg,var(--panel2),var(--theme-input))!important;border-color:var(--line)!important}
 .day-head{background:linear-gradient(135deg,var(--theme-dark),var(--panel2))!important;border-color:var(--line)!important}
@@ -42,7 +44,6 @@ h1 span,.ey,.banner h2,.stat b,.nav-icon{color:var(--theme-primary)!important}
 .bar{background:var(--line)!important}.bar i{background:var(--theme-primary)!important;box-shadow:0 0 10px var(--theme-glow)}
 .check{accent-color:var(--theme-primary)!important}
 .save{background:var(--theme-primary)!important;color:var(--bg)!important;box-shadow:0 0 18px var(--theme-glow)}
-.week b{color:var(--theme-primary)!important}
 .chart{border-color:var(--line)!important;background:var(--theme-input)!important}
 .reset-week{color:var(--muted)!important;background:var(--panel2)!important;border-color:var(--line)!important}.reset-week:hover{color:var(--theme-light)!important;border-color:var(--theme-primary)!important}
 .btm-theme-picker{width:100%;max-width:760px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-12px 0 22px;padding:8px 10px;background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:7px}
