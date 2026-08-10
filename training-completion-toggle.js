@@ -12,6 +12,8 @@ const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const css=document.createElement('style');
 css.id='btm-training-completion-toggle-style';
 css.textContent=`
+.exercise .check{display:none!important}
+.btm-week-complete-panel{display:none!important}
 .btm-ex-complete-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:12px}
 .btm-ex-complete-btn{cursor:pointer;border:1px solid var(--line,#294656);border-radius:6px;background:#0b151c;color:var(--muted,#8195a3);padding:9px 13px;font:10px 'JetBrains Mono';font-weight:700;letter-spacing:.03em;transition:background .28s ease,border-color .28s ease,color .28s ease,box-shadow .28s ease,transform .15s ease}
 .btm-ex-complete-btn:hover{transform:translateY(-1px);border-color:rgba(91,190,116,.65);color:#b7efc1}
@@ -19,11 +21,7 @@ css.textContent=`
 .exercise.btm-exercise-complete{border-left:2px solid #5bbe74!important;background:rgba(91,190,116,.075)!important;box-shadow:inset 0 0 18px rgba(91,190,116,.035)}
 .btm-training-ex-progress{margin:4px 0 12px;padding:11px 14px;border:1px solid var(--line,#294656);border-radius:7px;background:#0b151c;color:var(--muted,#8195a3);font:10px 'JetBrains Mono';display:flex;align-items:center;justify-content:space-between;gap:10px}
 .btm-training-ex-progress strong{color:#8ee19b;font-size:12px}
-.btm-training-week-complete{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;border-top:1px solid var(--line,#294656);color:var(--muted,#8195a3);font:10px 'JetBrains Mono'}
-.btm-training-week-complete button{cursor:pointer;border:1px solid rgba(91,190,116,.55);border-radius:6px;background:rgba(91,190,116,.10);color:#9de2ab;padding:9px 13px;font:10px 'JetBrains Mono';font-weight:700}
-.btm-training-week-complete button.is-complete{background:#5bbe74;color:#071016;border-color:#5bbe74;box-shadow:0 0 13px rgba(91,190,116,.12)}
-.exercise .check{display:none!important}
-@media(max-width:600px){.btm-training-ex-progress{flex-direction:column;align-items:flex-start}.btm-ex-complete-row{justify-content:stretch}.btm-ex-complete-btn{width:100%}.btm-training-week-complete{flex-direction:column;align-items:stretch}.btm-training-week-complete button{width:100%}}
+@media(max-width:600px){.btm-training-ex-progress{flex-direction:column;align-items:flex-start}.btm-ex-complete-row{justify-content:stretch}.btm-ex-complete-btn{width:100%}}
 `;
 document.head.appendChild(css);
 
@@ -66,7 +64,7 @@ function updateWeekState(w){
 function renderProgress(){
   const stats=document.querySelector('#trainingView .stats');
   if(!stats)return;
-  let p=stats.querySelector('.btm-training-ex-progress');
+  let p=stats.parentElement.querySelector('.btm-training-ex-progress');
   if(!p){p=document.createElement('div');p.className='btm-training-ex-progress';stats.parentElement.insertBefore(p,stats.nextSibling)}
   const c=count();
   p.innerHTML='<span>TRAINING PROGRESS</span><strong>'+c.done+' / '+c.total+' EXERCISES COMPLETED</strong>';
@@ -80,8 +78,7 @@ function renderButtons(){
     let row=card.querySelector('.btm-ex-complete-row');
     if(!row){
       row=document.createElement('div');row.className='btm-ex-complete-row';
-      const btn=document.createElement('button');btn.type='button';btn.className='btm-ex-complete-btn';row.appendChild(btn);
-      card.appendChild(row);
+      const btn=document.createElement('button');btn.type='button';btn.className='btm-ex-complete-btn';row.appendChild(btn);card.appendChild(row);
       btn.addEventListener('click',e=>{
         e.preventDefault();e.stopPropagation();
         const now=!exerciseDone(w,p.day,p.exercise);
@@ -99,40 +96,31 @@ function renderButtons(){
 }
 function syncWeekUI(){
   const grid=$('weekGrid');if(!grid)return;
-  const w=selectedWeek(),complete=weekCompleted(w);
+  const w=selectedWeek(),complete=weekCompleted(w),stored=read(TRAIN_KEY,{});
   [...grid.children].forEach((b,i)=>{
     const n=i+1;
-    b.classList.toggle('btm-ex-week-complete',complete&&n===w);
-    b.classList.toggle('is-complete',n===w&&complete);
-    b.title=n===w?(complete?'All required exercises completed':'Complete every required exercise to finish this week'):(completeForStoredWeek(n)?'Completed':'');
+    b.classList.toggle('btm-ex-week-complete',!!stored[String(n)]?.completed);
+    b.classList.toggle('is-complete',!!stored[String(n)]?.completed);
+    b.title=stored[String(n)]?.completed?'Completed':'Incomplete';
   });
-  const toolbar=grid.parentElement;
-  if(!toolbar)return;
-  let panel=toolbar.querySelector('.btm-training-week-complete');
-  if(panel)panel.remove();
-  const p=document.createElement('div');p.className='btm-training-week-complete';
-  p.innerHTML='<span>'+ (complete?'✓ WEEK '+w+' COMPLETED':'COMPLETE ALL EXERCISES TO FINISH WEEK '+w) +'</span><button type="button" class="'+(complete?'is-complete':'')+'">'+(complete?'✓ COMPLETED':'COMPLETE WEEK')+'</button>';
-  const btn=p.querySelector('button');
-  btn.addEventListener('click',()=>{
-    if(weekCompleted(w)){return}
-    const cards=exerciseCards();
-    cards.forEach((card,i)=>{const x=identify(card,i);setExercise(w,x.day,x.exercise,true)});
-    updateWeekState(w);renderButtons();syncWeekUI();
-  });
-  toolbar.appendChild(p);
+  if(complete){const all=read(TRAIN_KEY,{});all[String(w)]={completed:true};write(TRAIN_KEY,all)}
+  else if(stored[String(w)]?.completed){delete stored[String(w)];write(TRAIN_KEY,stored)}
 }
-function completeForStoredWeek(w){return !!read(TRAIN_KEY,{})[String(w)]?.completed;}
-function observe(){
-  const mo=new MutationObserver(()=>{clearTimeout(observe.t);observe.t=setTimeout(()=>{renderButtons();syncWeekUI()},25)});
-  mo.observe(document.body,{childList:true,subtree:true});
-  window.addEventListener('storage',()=>{renderButtons();syncWeekUI()});
+function cleanLegacyControls(){
+  document.querySelectorAll('.btm-week-complete-panel').forEach(x=>x.remove());
+  const old=$('btmTrainingCompleteBtn');if(old)old.closest('.btm-week-complete-panel')?.remove();
 }
-function boot(){
+function refresh(){
+  cleanLegacyControls();
+  const cards=exerciseCards();
+  if(!cards.length)return;
   renderButtons();
   syncWeekUI();
-  observe();
-  setTimeout(()=>{renderButtons();syncWeekUI()},100);
-  setTimeout(()=>{renderButtons();syncWeekUI()},500);
+}
+function boot(){
+  refresh();
+  setInterval(refresh,350);
+  window.addEventListener('storage',refresh);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
