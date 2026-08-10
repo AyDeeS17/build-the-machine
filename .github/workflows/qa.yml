@@ -19,6 +19,7 @@ jobs:
           node --check ui-polish.js
           node --check training-readability.js
           node --check reset-ui-cleanup.js
+          node --check week-consistency.js
       - name: Check Week configuration
         run: |
           node --check week-config.js
@@ -51,7 +52,7 @@ jobs:
           grep -q 'btm-inline-emblem' reset-ui-cleanup.js
       - name: Check removed MACHINE effects stay removed
         run: |
-          ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git .
+          ! grep -RniE 'gavel|rules-gavel|gavel-anchor|MACHINE section marker|h1 span::after' --exclude-dir=.git --exclude='qa.yml' .
       - name: Check legacy character system is gone
         run: |
           ! grep -RniE 'Goku|Tanjiro Kamado|Yuji Itadori|Eren Yeager|Thorfinn|Vegeta|Gojo Satoru|Toji Fushiguro|Ken Kaneki|Itachi Uchiha|Griffith|Guts|ANIME PROGRESSION|ANIME CHARACTER|MANGA PROGRESSION' --exclude-dir=.git .
