@@ -1,55 +1,27 @@
-/* Week character portraits, mature face-first presentation for the 12-week selector. */
+/* Build The Machine, 2D manga-style week portraits. */
 (()=>{
 'use strict';
-if(window.__BTM_WEEK_PORTRAITS__)return;
-window.__BTM_WEEK_PORTRAITS__=true;
+if(window.__BTM_MANGA_CHARACTERS__)return;
+window.__BTM_MANGA_CHARACTERS__=true;
 const C=[
-{name:'Goku',hair:'#151a22',skin:'#c98968',outfit:'#e77c24',accent:'#f1b84b',style:'spike'},
-{name:'Tanjiro Kamado',hair:'#241d27',skin:'#c98f72',outfit:'#18252a',accent:'#315b49',style:'fringe'},
-{name:'Yuji Itadori',hair:'#b9757d',skin:'#c99176',outfit:'#18222d',accent:'#3d6284',style:'short'},
-{name:'Eren Yeager',hair:'#30231f',skin:'#c78e70',outfit:'#263e45',accent:'#526f61',style:'long'},
-{name:'Thorfinn',hair:'#d3ad6b',skin:'#d19a78',outfit:'#34444c',accent:'#7e9aa5',style:'braid'},
-{name:'Vegeta',hair:'#10161f',skin:'#c88767',outfit:'#234c79',accent:'#dfe6ef',style:'upright'},
-{name:'Gojo Satoru',hair:'#d7e2e9',skin:'#d39a7c',outfit:'#111923',accent:'#67b9e4',style:'white'},
-{name:'Toji Fushiguro',hair:'#171b1f',skin:'#c78a6c',outfit:'#2d403d',accent:'#789088',style:'messy'},
-{name:'Ken Kaneki',hair:'#eef2f3',skin:'#c88f73',outfit:'#171c24',accent:'#a33e51',style:'whitefringe'},
-{name:'Itachi Uchiha',hair:'#11151b',skin:'#c88f73',outfit:'#171b24',accent:'#8d3041',style:'longbang'},
-{name:'Griffith',hair:'#efe5cf',skin:'#d6a384',outfit:'#dfe6ea',accent:'#b9c9d2',style:'flow'},
-{name:'Guts',hair:'#15181d',skin:'#b98268',outfit:'#20252b',accent:'#707a82',style:'spike'}
+{name:'Goku',hair:'#f4f5f5',ink:'#121a21',skin:'#b97961',accent:'#d7e7ef',type:'wild',mark:'brow'},
+{name:'Tanjiro Kamado',hair:'#171d25',ink:'#0b1117',skin:'#bd8069',accent:'#47708a',type:'fringe',mark:'scar'},
+{name:'Yuji Itadori',hair:'#b9c1c5',ink:'#151a20',skin:'#bc8069',accent:'#6b91a8',type:'short',mark:'brow'},
+{name:'Eren Yeager',hair:'#15181d',ink:'#0c1116',skin:'#b97b64',accent:'#506c79',type:'long',mark:'strand'},
+{name:'Thorfinn',hair:'#b9c2c5',ink:'#11171c',skin:'#c18a72',accent:'#748f9b',type:'fringe',mark:'scar'},
+{name:'Vegeta',hair:'#10151b',ink:'#070b10',skin:'#b97961',accent:'#7898ad',type:'spike',mark:'brow'},
+{name:'Gojo Satoru',hair:'#edf3f4',ink:'#101820',skin:'#c48c74',accent:'#6ab9dc',type:'soft',mark:'blind'},
+{name:'Toji Fushiguro',hair:'#151a20',ink:'#080d12',skin:'#b87961',accent:'#708991',type:'messy',mark:'scar'},
+{name:'Ken Kaneki',hair:'#f0f3f3',ink:'#10161c',skin:'#bf806a',accent:'#7898aa',type:'fringe',mark:'under'},
+{name:'Itachi Uchiha',hair:'#11151b',ink:'#070b10',skin:'#bd8069',accent:'#70899a',type:'long',mark:'lines'},
+{name:'Griffith',hair:'#ece8dd',ink:'#11161b',skin:'#c99078',accent:'#aabcc6',type:'flow',mark:'brow'},
+{name:'Guts',hair:'#15191e',ink:'#080c11',skin:'#a9705b',accent:'#71838e',type:'heavy',mark:'scar'}
 ];
-const hair=c=>{const h=c.hair;const m={
-spike:`<path d="M26 42Q20 20 34 11L39 22L44 6L48 20L57 8L55 23L66 14L61 42Q45 49 26 42Z"/>`,
-fringe:`<path d="M26 42Q22 20 37 12Q55 4 66 20L62 43L55 32L50 43L45 30L38 42L32 33Z"/>`,
-short:`<path d="M27 41Q23 21 38 13Q55 7 66 21L62 42L55 34L50 43L44 32L38 42L32 34Z"/>`,
-long:`<path d="M25 43Q21 18 38 10Q56 4 66 20L66 72L58 78L56 43L49 31L43 43L36 31L29 46Z"/>`,
-braid:`<path d="M26 42Q22 19 38 11Q56 5 66 20L62 43L55 32L50 43L44 31L37 42L32 34Z"/><path d="M64 40Q75 48 66 57Q75 63 66 71Q73 77 65 84" fill="none" stroke="${h}" stroke-width="7" stroke-linecap="round"/>`,
-upright:`<path d="M27 42Q22 22 33 14L31 4L40 15L44 0L49 14L57 3L56 16L66 9L62 42L55 32L50 42L44 30L38 42L32 34Z"/>`,
-white:`<path d="M25 42Q22 20 38 11Q55 4 66 20L62 43L55 32L50 43L44 30L38 42L32 33Z"/>`,
-messy:`<path d="M25 43Q21 19 38 11Q55 5 67 20L73 13L70 29L65 25L63 43L55 32L49 43L43 29L36 42L31 34Z"/>`,
-whitefringe:`<path d="M25 42Q22 20 38 11Q55 5 66 20L62 43L55 31L49 44L44 29L38 42L32 33Z"/>`,
-longbang:`<path d="M25 43Q21 18 38 10Q56 4 66 20L66 72L58 78L56 44L50 31L44 44L37 31L30 45Z"/>`,
-flow:`<path d="M25 43Q22 19 39 10Q57 4 68 21L69 70Q64 77 57 76L56 43L49 31L43 43L36 31L29 45Z"/>`
-};return `<g fill="${h}">${m[c.style]||m.short}</g>`};
-const portrait=c=>`<svg class="btm-character-art" viewBox="0 0 92 110" role="img" aria-label="${c.name}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-<defs><radialGradient id="skin${c.name.replace(/\W/g,'')}" cx="45%" cy="35%"><stop offset="0" stop-color="#f0b89a"/><stop offset=".62" stop-color="${c.skin}"/><stop offset="1" stop-color="#80564d"/></radialGradient><linearGradient id="coat${c.name.replace(/\W/g,'')}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${c.accent}" stop-opacity=".55"/><stop offset="1" stop-color="${c.outfit}"/></linearGradient><filter id="shadow${c.name.replace(/\W/g,'')}"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity=".55"/></filter></defs>
-<g filter="url(#shadow${c.name.replace(/\W/g,'')})">
-<path d="M24 108Q25 82 35 76L57 76Q68 82 70 108Z" fill="url(#coat${c.name.replace(/\W/g,'')})"/>
-<path d="M35 73Q45 82 57 73L58 88Q46 96 34 88Z" fill="url(#skin${c.name.replace(/\W/g,'')})"/>
-<path d="M25 43Q26 21 46 17Q66 21 68 43L64 65Q58 79 46 82Q33 79 28 65Z" fill="url(#skin${c.name.replace(/\W/g,'')})"/>
-${hair(c)}
-<path d="M31 45Q36 39 41 44M51 44Q57 39 62 45" fill="none" stroke="#3b2526" stroke-width="3" stroke-linecap="round"/>
-<path d="M34 51Q39 47 43 51M49 51Q54 47 59 51" fill="none" stroke="#151a22" stroke-width="2.3" stroke-linecap="round"/>
-<ellipse cx="40" cy="52" rx="2.2" ry="1.6" fill="#0a1015"/><ellipse cx="54" cy="52" rx="2.2" ry="1.6" fill="#0a1015"/>
-<path d="M46 52L44 61L48 62" fill="none" stroke="#7d4d46" stroke-width="1.3" stroke-linecap="round"/>
-<path d="M39 68Q46 72 54 68" fill="none" stroke="#5e3535" stroke-width="1.8" stroke-linecap="round"/>
-<path d="M29 61Q46 73 64 61" fill="none" stroke="#ffffff" stroke-opacity=".11" stroke-width="3"/>
-</g>
-<path class="btm-character-trace" d="M26 43Q26 21 46 17Q66 21 68 43L64 65Q58 79 46 82Q33 79 28 65Z" pathLength="1"/>
-</svg>`;
-const panelPortrait=c=>`<div class="btm-selected-portrait"><div class="btm-selected-art">${portrait(c)}</div><div><div class="ey">WEEK CHARACTER</div><h3>${c.name}</h3><p>Progression symbol for this stage of the machine.</p></div></div>`;
-const ensurePanel=()=>{const toolbar=document.querySelector('.week-toolbar');if(!toolbar||document.getElementById('btm-selected-character'))return;const p=document.createElement('div');p.id='btm-selected-character';p.className='btm-selected-character';p.innerHTML='<div id="btm-selected-character-inner"></div>';toolbar.appendChild(p)};
-const updatePanel=()=>{ensurePanel();const grid=document.getElementById('weekGrid'),target=document.getElementById('btm-selected-character-inner');if(!grid||!target)return;const cards=[...grid.querySelectorAll('.week')].slice(0,12),i=Math.max(0,cards.findIndex(x=>x.classList.contains('active')));if(C[i])target.innerHTML=panelPortrait(C[i])};
-const apply=()=>{const grid=document.getElementById('weekGrid');if(!grid)return;[...grid.querySelectorAll('.week')].slice(0,12).forEach((card,i)=>{if(card.querySelector('.btm-week-pixel'))return;const wrap=document.createElement('span');wrap.className='btm-week-pixel';wrap.dataset.character=C[i].name;wrap.title=C[i].name;wrap.innerHTML=portrait(C[i]);card.appendChild(wrap)});updatePanel()};
-const boot=()=>{if(!document.getElementById('btm-week-pixels-link')){const l=document.createElement('link');l.id='btm-week-pixels-link';l.rel='stylesheet';l.href='./week-pixels.css';document.head.appendChild(l)};ensurePanel();apply();const grid=document.getElementById('weekGrid');if(grid){grid.addEventListener('click',()=>setTimeout(updatePanel,0),{passive:true});const obs=new MutationObserver(()=>{apply()});obs.observe(grid,{childList:true,subtree:true});window.__btmWeekCharacterObserver=obs}};
+const hair=c=>({wild:`<path d="M18 42 Q10 24 23 16 L15 7 L31 14 L29 1 L41 13 L47 0 L53 14 L68 5 L63 20 Q78 23 68 42 L58 32 L52 38 L45 25 L38 39 L30 27 L24 42Z"/>`,fringe:`<path d="M19 43 Q15 18 35 12 Q55 7 68 25 L65 44 L56 32 L50 41 L43 28 L35 42 L29 32 L23 45Z"/>`,short:`<path d="M20 42 Q18 19 36 13 Q55 8 68 25 L65 42 L56 32 L50 40 L44 28 L36 41 L29 31 L24 43Z"/>`,long:`<path d="M19 43 Q15 17 35 12 Q55 8 68 24 L69 82 L59 91 L56 42 L50 30 L43 42 L35 30 L27 45Z"/>`,spike:`<path d="M19 42 Q14 22 26 14 L24 3 L35 13 L39 0 L46 13 L56 2 L55 15 L70 7 L65 28 L68 42 L56 31 L50 41 L43 27 L36 40 L29 30 L23 43Z"/>`,soft:`<path d="M19 43 Q17 18 36 11 Q55 8 68 25 L64 45 L56 32 L50 40 L43 28 L36 41 L29 32 L24 44Z"/>`,messy:`<path d="M18 43 Q14 19 35 11 Q55 7 68 24 L76 17 L70 34 L67 43 L57 31 L51 41 L44 27 L37 40 L30 30 L24 44Z"/>`,flow:`<path d="M19 43 Q16 18 36 11 Q57 7 69 25 L74 69 Q67 80 58 83 L56 43 L50 30 L43 42 L35 30 L27 44Z"/>`,heavy:`<path d="M18 44 Q14 17 35 11 Q56 7 69 25 L67 47 L58 34 L51 42 L44 27 L37 41 L29 32 L23 45Z"/>`}[c.type]||'');
+const marks=c=>{if(c.mark==='scar')return '<path d="M29 28 L38 38" stroke="#252c32" stroke-width="1.8"/><path d="M31 31 L40 41" stroke="#252c32" stroke-width=".8"/>';if(c.mark==='blind')return '<path d="M27 30 Q45 26 63 31 L61 38 Q45 35 29 38Z" fill="#10161d"/><path d="M61 34 L70 42" stroke="#10161d" stroke-width="2"/>';if(c.mark==='under')return '<path d="M30 40 Q35 43 40 40 M50 40 Q55 43 60 40" fill="none" stroke="#5e3f3c" stroke-width="1.2"/>';if(c.mark==='lines')return '<path d="M27 35 L23 39 M63 35 L67 39" stroke="#5d3e3b" stroke-width="1.1"/>';if(c.mark==='strand')return '<path d="M61 24 Q54 40 58 55" fill="none" stroke="#080d12" stroke-width="2"/>';return '<path d="M28 31 Q34 28 40 31 M50 31 Q56 28 62 31" fill="none" stroke="#151c23" stroke-width="1.3"/>';};
+const portrait=c=>`<svg class="btm-manga-art" viewBox="0 0 88 100" role="img" aria-label="${c.name} manga portrait" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="inkfade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.accent}" stop-opacity=".18"/><stop offset="1" stop-color="#071016" stop-opacity="0"/></linearGradient></defs><g class="btm-manga-ink" stroke="${c.ink}" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="44" cy="50" rx="27" ry="35" fill="#0a1117" opacity=".3"/><path d="M23 45 Q20 63 28 76 Q35 87 44 89 Q54 87 62 76 Q69 63 66 45 Q61 25 44 24 Q27 25 23 45Z" fill="${c.skin}" stroke-width="1.5"/><path d="M28 56 Q25 73 32 84 L43 94 L55 84 Q63 72 60 55 Q56 68 44 71 Q32 68 28 56Z" fill="url(#inkfade)" stroke="none"/><path d="M31 49 Q35 46 40 49 M49 49 Q54 46 59 49" fill="none" stroke-width="1.5"/><path d="M34 47 L39 47 M49 47 L54 47" stroke-width="2"/><path d="M42 56 Q44 58 47 56" fill="none" stroke-width="1.1"/><path d="M37 64 Q44 68 52 64" fill="none" stroke-width="1.2"/><path d="M31 73 Q44 80 58 73" fill="none" stroke="#151b21" stroke-width="1" opacity=".6"/><g fill="${c.hair}" stroke-width="1.2">${hair(c)}</g>${marks(c)}<path d="M23 92 Q44 82 65 92 L72 100 L16 100Z" fill="#101820" stroke-width="1.3"/><path d="M28 91 Q44 87 60 91" fill="none" stroke="${c.accent}" stroke-width="1.5" opacity=".75"/><path d="M18 17 L26 10 M64 12 L72 18 M11 36 L19 34 M69 35 L77 38" stroke="${c.accent}" stroke-width=".7" opacity=".45"/></g><path class="btm-manga-trace" d="M19 43 Q14 18 35 11 Q56 7 69 25 L67 47 Q64 68 55 82 Q48 92 44 94 Q37 92 30 82 Q21 68 19 43Z" pathLength="1"/></svg>`;
+function installPanel(){const grid=document.getElementById('weekGrid');if(!grid)return null;let panel=document.getElementById('btm-manga-week-panel');if(!panel){panel=document.createElement('section');panel.id='btm-manga-week-panel';panel.className='btm-manga-panel';grid.parentElement.parentElement.insertAdjacentElement('afterend',panel)}return panel}
+function sync(){const grid=document.getElementById('weekGrid');if(!grid)return;const cards=[...grid.querySelectorAll('.week')].slice(0,12);cards.forEach((card,i)=>{if(card.querySelector('.btm-week-manga'))return;const w=document.createElement('span');w.className='btm-week-manga';w.dataset.character=C[i].name;w.innerHTML=portrait(C[i]);card.appendChild(w)});const active=Math.max(0,cards.findIndex(x=>x.classList.contains('active')));const panel=installPanel();if(panel){const c=C[active]||C[0];panel.innerHTML=`<div class="btm-manga-panel-art">${portrait(c)}</div><div class="btm-manga-panel-copy"><div class="ey">WEEK ${active+1} · ANIME PROGRESSION</div><h2>${c.name}</h2><p class="note">${active===6?'Recovery and deload week. ':''}A serious 2D manga portrait representing this stage of the transformation.</p><div class="btm-manga-panel-line"><span>WEEK ${String(active+1).padStart(2,'0')}</span><i></i><span>${active===6?'RECOVER & RESET':'PROGRESSION'}</span></div></div>`}}
+function boot(){const grid=document.getElementById('weekGrid');if(!grid)return;sync();if(!grid.__btmMangaBound){grid.__btmMangaBound=true;grid.addEventListener('click',()=>setTimeout(sync,0));const obs=new MutationObserver(()=>sync());obs.observe(grid,{childList:true,subtree:true});window.__btmMangaObserver=obs}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
