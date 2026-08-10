@@ -41,7 +41,7 @@ jobs:
           const navButtons=[trainingBtn,foodBtn,runningBtn,sleepBtn,progressBtn];
           function selectNav(active){navButtons.forEach(b=>b&&b.classList.remove('active'));if(active)active.classList.add('active')}
           function showModule(title,note,btn){if(trainingView)trainingView.style.display='none';if(foodView)foodView.classList.remove('show');if(moduleView){moduleView.style.display='block';moduleTitle.textContent=title;moduleNote.textContent=note;}selectNav(btn)}
-          if(runningBtn)runningBtn.onclick=()=>showModule('RUNNING','Running tracking: 3 runs per week, starting at 5 KM and increasing 10% each week, with distance, pace and weekly analytics.',runningBtn);
+          if(runningBtn)runningBtn.onclick=()=>location.href='running.html';
           if(sleepBtn)sleepBtn.onclick=()=>showModule('SLEEP','Sleep tracking: bedtime, wake time, duration, schedule scoring and weekly trends.',sleepBtn);
           if(progressBtn)progressBtn.onclick=()=>showModule('OVERALL PROGRESS','Overall progress will combine training, running, nutrition and sleep into one 12-week dashboard.',progressBtn);
           if(trainingBtn)trainingBtn.onclick=()=>{moduleView.style.display='none';trainingView.style.display='block';selectNav(trainingBtn)};
