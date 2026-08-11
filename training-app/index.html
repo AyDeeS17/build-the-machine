@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="week-style.css">
 <link rel="stylesheet" href="progress-style.css">
+<link rel="stylesheet" href="feature-style.css">
 </head>
 <body>
 <div class="app-shell">
@@ -36,6 +37,8 @@
       <p id="rankQuote" class="quote"></p>
     </section>
 
+    <section id="todayCard" class="today-card section-block"></section>
+
     <section class="section-block">
       <div class="section-title"><span>SELECT WEEK</span><span id="weekCount">0 / 12 COMPLETE</span></div>
       <div id="weekGrid" class="week-grid"></div>
@@ -49,53 +52,20 @@
   </div>
 
   <section id="progressView" class="progress-view hidden" aria-labelledby="progressTitle">
-    <div class="progress-heading">
-      <div><div class="eyebrow">PERFORMANCE ANALYSIS</div><h2 id="progressTitle">PROGRESS</h2></div>
-      <div class="progress-live">LIVE DATA</div>
-    </div>
-    <section class="progress-hero">
-      <div class="progress-kicker">OVERALL PROGRESS</div>
-      <div class="progress-big" id="progressOverall">0%</div>
-      <div class="progress-sub" id="progressTracked">NO TRACKED WEEKS YET</div>
-      <div class="progress-track"><i id="progressOverallFill"></i></div>
-    </section>
-    <section class="chart-card">
-      <div class="chart-head"><span>12-WEEK PROGRESSION</span><span>0 — 100%</span></div>
-      <div class="chart-wrap"><svg id="progressChart" viewBox="0 0 600 260" role="img" aria-label="12 week progress chart"></svg></div>
-      <div id="chartLabels" class="chart-labels"></div>
-    </section>
-    <section class="stat-grid" aria-label="Progress statistics">
-      <div class="stat"><span>CURRENT WEEK</span><strong id="statCurrent">WEEK 1</strong></div>
-      <div class="stat"><span>BEST WEEK</span><strong id="statBest">—</strong></div>
-      <div class="stat"><span>AVERAGE</span><strong id="statAverage">—</strong></div>
-      <div class="stat"><span>TREND</span><strong id="statTrend">0% →</strong></div>
-      <div class="stat"><span>CLEAN EXERCISES</span><strong id="statClean">0</strong></div>
-      <div class="stat"><span>MEDIOCRE</span><strong id="statMediocre">0</strong></div>
-      <div class="stat"><span>BAD</span><strong id="statBad">0</strong></div>
-      <div class="stat"><span>COMPLETION RATE</span><strong id="statCompletion">0%</strong></div>
-    </section>
-    <section class="weekly-list">
-      <div class="section-title"><span>WEEKLY SCORES</span><span id="weeklyTracked">0 TRACKED</span></div>
-      <div id="weeklyScores"></div>
-    </section>
+    <div class="progress-heading"><div><div class="eyebrow">PERFORMANCE ANALYSIS</div><h2 id="progressTitle">PROGRESS</h2></div><div class="progress-live">LIVE DATA</div></div>
+    <section class="progress-hero"><div class="progress-kicker">OVERALL PROGRESS</div><div class="progress-big" id="progressOverall">0%</div><div class="progress-sub" id="progressTracked">NO TRACKED WEEKS YET</div><div class="progress-track"><i id="progressOverallFill"></i></div></section>
+    <section class="chart-card"><div class="chart-head"><span>12-WEEK PROGRESSION</span><span>0 — 100%</span></div><div class="chart-wrap"><svg id="progressChart" viewBox="0 0 600 260" role="img" aria-label="12 week progress chart"></svg></div><div id="chartLabels" class="chart-labels"></div></section>
+    <section class="stat-grid" aria-label="Progress statistics"><div class="stat"><span>CURRENT WEEK</span><strong id="statCurrent">WEEK 1</strong></div><div class="stat"><span>BEST WEEK</span><strong id="statBest">—</strong></div><div class="stat"><span>AVERAGE</span><strong id="statAverage">—</strong></div><div class="stat"><span>TREND</span><strong id="statTrend">0% →</strong></div><div class="stat"><span>CLEAN EXERCISES</span><strong id="statClean">0</strong></div><div class="stat"><span>MEDIOCRE</span><strong id="statMediocre">0</strong></div><div class="stat"><span>BAD</span><strong id="statBad">0</strong></div><div class="stat"><span>COMPLETION RATE</span><strong id="statCompletion">0%</strong></div></section>
+    <section class="feature-panel"><div class="feature-heading"><span>PERSONAL RECORDS</span><span id="prCount">0</span></div><div id="prList" class="pr-list"></div></section>
+    <section class="feature-panel"><div class="feature-heading"><span>ACHIEVEMENTS</span><span id="achievementCount">0 / 8</span></div><div id="achievementList" class="achievement-list"></div></section>
+    <section class="feature-panel"><div class="feature-heading"><span>TRAINING CONSISTENCY</span><span id="consistencyText">0%</span></div><div class="consistency-track"><i id="consistencyFill"></i></div><p id="consistencyNote" class="feature-note">Complete prescribed sessions to build consistency.</p></section>
+    <section class="weekly-list"><div class="section-title"><span>WEEKLY SCORES</span><span id="weeklyTracked">0 TRACKED</span></div><div id="weeklyScores"></div></section>
   </section>
 </main>
 
-<div id="resetSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
-  <div class="sheet">
-    <div class="sheet-grab"></div><h2 id="resetTitle">RESET WEEK</h2><p id="resetText">All training progress for this Week will be erased.</p>
-    <div class="sheet-actions"><button id="cancelReset" class="secondary">CANCEL</button><button id="confirmReset" class="danger">RESET</button></div>
-  </div>
-</div>
-<div id="settingsSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-  <div class="sheet">
-    <div class="sheet-grab"></div><h2 id="settingsTitle">TRAINING DATA</h2><p>Progress is stored locally on this iPhone and remains available offline.</p>
-    <button id="themeToggle" class="sheet-button">DARK MODE: OFF</button>
-    <button id="resetCurrent" class="sheet-button">RESET CURRENT WEEK</button>
-    <button id="resetAll" class="sheet-button danger-outline">RESET ALL TRAINING DATA</button>
-    <button id="closeSettings" class="secondary full">CLOSE</button>
-  </div>
-</div>
+<div id="restBar" class="rest-bar hidden"><div><span class="eyebrow">REST</span><strong id="restTime">01:30</strong></div><button id="restPlus">+30</button><button id="restSkip">SKIP</button></div>
+<div id="resetSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resetTitle"><div class="sheet"><div class="sheet-grab"></div><h2 id="resetTitle">RESET WEEK</h2><p id="resetText">All training progress for this Week will be erased.</p><div class="sheet-actions"><button id="cancelReset" class="secondary">CANCEL</button><button id="confirmReset" class="danger">RESET</button></div></div></div>
+<div id="settingsSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="sheet"><div class="sheet-grab"></div><h2 id="settingsTitle">TRAINING DATA</h2><p>Progress is stored locally on this iPhone and remains available offline.</p><button id="themeToggle" class="sheet-button">DARK MODE: OFF</button><button id="resetCurrent" class="sheet-button">RESET CURRENT WEEK</button><button id="resetAll" class="sheet-button danger-outline">RESET ALL TRAINING DATA</button><button id="closeSettings" class="secondary full">CLOSE</button></div></div>
 <script src="../week-config.js"></script>
 <script src="../training-config.js"></script>
 <script src="app.js"></script>
