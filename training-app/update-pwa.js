@@ -1,0 +1,15 @@
+(()=>{
+'use strict';
+if(!('serviceWorker' in navigator))return;
+window.addEventListener('load',async()=>{
+  try{
+    const reg=await navigator.serviceWorker.register('./sw.js?v=9',{scope:'./',updateViaCache:'none'});
+    await reg.update();
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(window.__btmPwaReloaded)return;
+      window.__btmPwaReloaded=true;
+      window.location.reload();
+    });
+  }catch(err){console.warn('BTM PWA update failed',err)}
+});
+})();
