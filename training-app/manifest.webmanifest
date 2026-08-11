@@ -2,14 +2,14 @@
   "name":"BUILD THE MACHINE Training",
   "short_name":"BTM Training",
   "description":"Standalone 12-week calisthenics training program.",
-  "start_url":"/build-the-machine/training-app/?v=16",
+  "start_url":"/build-the-machine/training-app/?v=17",
   "scope":"/build-the-machine/training-app/",
   "display":"standalone",
   "orientation":"portrait",
   "background_color":"#050b10",
   "theme_color":"#071016",
   "icons":[
-    {"src":"../apple-touch-icon-v2.png?v=16","sizes":"180x180","type":"image/png","purpose":"any maskable"},
-    {"src":"../icon.svg?v=16","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+    {"src":"../apple-touch-icon-v2.png?v=17","sizes":"180x180","type":"image/png","purpose":"any maskable"},
+    {"src":"../icon.svg?v=17","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
 }
