@@ -12,3 +12,9 @@ window.BTM_WEEKS = Object.freeze([
   { id: 11, rank: 'GRANDMASTER', color: '#6f9ee8', isDeload: false },
   { id: 12, rank: 'LEGEND', color: '#66b9df', isDeload: false }
 ]);
+
+(()=>{
+  const load=src=>{const s=document.createElement('script');s.src=`./${src}?v=6`;s.defer=false;document.head.appendChild(s)};
+  const boot=()=>{load('pwa-update.js');load('training-days.js')};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
