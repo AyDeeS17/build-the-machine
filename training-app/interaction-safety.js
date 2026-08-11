@@ -22,13 +22,22 @@ const modalIds=['settingsSheet','resetSheet'];
 function syncModal(id){
  const el=document.getElementById(id);
  if(!el)return;
- const inactive=el.classList.contains('hidden')||el.classList.contains('closing');
- el.style.pointerEvents=inactive?'none':'auto';
- el.style.visibility=el.classList.contains('hidden')?'hidden':'visible';
+ const hidden=el.classList.contains('hidden');
+ const closing=el.classList.contains('closing');
+ el.style.pointerEvents=(hidden||closing)?'none':'auto';
+ el.style.visibility=hidden?'hidden':'visible';
 }
-function sync(){modalIds.forEach(syncModal);const guided=document.getElementById('btmGuided');if(guided){guided.style.pointerEvents=guided.classList.contains('open')?'auto':'none';guided.style.visibility=guided.classList.contains('open')?'visible':'hidden'}}
+function sync(){
+ modalIds.forEach(syncModal);
+ const guided=document.getElementById('btmGuided');
+ if(guided){
+  const open=guided.classList.contains('open');
+  guided.style.pointerEvents=open?'auto':'none';
+  guided.style.visibility=open?'visible':'hidden';
+ }
+}
 sync();
 const observer=new MutationObserver(sync);
-observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','aria-hidden']});
+observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden']});
 window.addEventListener('pageshow',sync,{passive:true});
 })();
