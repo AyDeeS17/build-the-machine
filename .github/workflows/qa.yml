@@ -52,8 +52,7 @@ jobs:
             }
           }
           const rirAvg=w=>{const a=[];p[w].days.forEach(d=>d.exercises.forEach(e=>a.push(e.rir)));return a.reduce((x,y)=>x+y,0)/a.length};
-          if(!(rirAvg(1)>rirAvg(6) && rirAvg(6)>rirAvg(7)===false)) throw new Error('RIR progression sanity check failed');
-          if(!(rirAvg(7)>rirAvg(8) && rirAvg(8)>rirAvg(12))) throw new Error('RIR does not recover after deload and progress toward peak');
+          if(!(rirAvg(1)>rirAvg(6) && rirAvg(7)>rirAvg(6) && rirAvg(7)>rirAvg(8) && rirAvg(8)>rirAvg(12))) throw new Error('RIR progression sanity check failed');
           console.log('Progression QA passed:', weeks.map(w=>`W${w}=${totalSets(w)} sets, avgRIR=${rirAvg(w).toFixed(2)}`).join(' | '));
           NODE
       - name: Check navigation contract
