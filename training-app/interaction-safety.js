@@ -35,7 +35,6 @@ function syncModal(id){
  const open=!hidden&&!closing;
  el.style.pointerEvents=open?'auto':'none';
  el.style.visibility=open?'visible':'hidden';
- el.setAttribute('aria-hidden',String(!open));
 }
 function sync(){
  modalIds.forEach(syncModal);
@@ -44,11 +43,10 @@ function sync(){
   const open=guided.classList.contains('open');
   guided.style.pointerEvents=open?'auto':'none';
   guided.style.visibility=open?'visible':'hidden';
-  guided.setAttribute('aria-hidden',String(!open));
  }
 }
 sync();
 const observer=new MutationObserver(sync);
-observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','aria-hidden']});
+observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 window.addEventListener('pageshow',sync,{passive:true});
 })();
