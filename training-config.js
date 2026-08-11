@@ -22,7 +22,7 @@ lsit:[p('L-sit tuck',4,'5–8s',3),p('L-sit tuck',4,'6–9s',3),p('L-sit tuck',4
 hang:[p('Dead hang',2,'30–40s',3),p('Dead hang',2,'32–42s',3),p('Dead hang',2,'35–45s',2.5),p('Dead hang',2,'38–48s',2),p('Active hang',2,'30–40s',2),p('Active hang',2,'35–45s',1.5),p('Dead hang',2,'20–30s',4),p('Active hang',2,'35–45s',2),p('Active hang',2,'40–50s',2),p('Active hang, scapular depression',2,'30–40s',1.5),p('Active hang, scapular depression',2,'35–45s',1),p('Active hang, scapular depression',2,'40–50s',1)]
 };
 const names={pull:'Pull-ups',dips:'Chest-focused dips',row:'Australian rows',push:'Push-ups',scap:'Scapular pull-ups',hollow:'Hollow hold',bulg:'Bulgarian split squats',squat:'Bodyweight squats',calf:'Single-leg calf raises',wall:'Wall sit',knee:'Hanging knee raises',side:'Side plank',chin:'Chin-ups',pike:'Pike push-ups',diamond:'Diamond push-ups',closechin:'Close-grip chin-ups',lsit:'L-sit progression',hang:'Dead hang'};
-const structure=[['Tuesday · Chest + Back',['pull','dips','row','push','scap','hollow']],['Thursday · Legs + Core',['bulg','squat','calf','wall','knee','hollow','side']],['Saturday · Shoulders + Arms',['chin','pike','diamond','closechin','dips','lsit','hang']]];
+const structure=[['Tuesday · Chest + Back',['pull','dips','row','push','scap','hollow']],['Thursday · Legs + Core',['bulg','squat','calf','wall','knee','hollow','side']],['Friday · Shoulders + Arms',['chin','pike','diamond','closechin','dips','lsit','hang']]];
 const trainingWeeks={};
 for(let w=1;w<=12;w++) trainingWeeks[w]={id:w,deload:w===7,days:structure.map(([day,keys])=>({day,exercises:keys.map(key=>{const x=P[key][w-1];return {key,name:names[key],variation:x.variation,sets:x.sets,reps:x.reps,rir:x.rir};})}))};
 window.BTM_TRAINING_WEEKS=Object.freeze(trainingWeeks);
