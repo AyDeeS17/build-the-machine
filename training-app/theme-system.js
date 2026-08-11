@@ -1,0 +1,16 @@
+(()=>{'use strict';
+const KEY='btm_theme_v1';
+const themes={
+ ocean:{name:'OCEAN',accent:'#66b9df',accent2:'#8ed6ee',bg:'#050b10',panel:'#0b151c',panel2:'#0e1b23',line:'#203845',text:'#edf7fb',muted:'#8298a5',glow:'rgba(102,185,223,.22)'},
+ forge:{name:'FORGE',accent:'#d96b62',accent2:'#ef9b72',bg:'#09090a',panel:'#151113',panel2:'#1b1517',line:'#3a272a',text:'#f5eeee',muted:'#a89595',glow:'rgba(217,107,98,.22)'},
+ forest:{name:'FOREST',accent:'#6fbd83',accent2:'#9bd59d',bg:'#060c09',panel:'#0c1711',panel2:'#101d15',line:'#233b2b',text:'#edf7ef',muted:'#899e90',glow:'rgba(111,189,131,.22)'},
+ void:{name:'VOID',accent:'#9a82df',accent2:'#c2aaf3',bg:'#08070d',panel:'#100e19',panel2:'#15121f',line:'#30274a',text:'#f2effa',muted:'#9189a5',glow:'rgba(154,130,223,.22)'},
+ titan:{name:'TITAN',accent:'#d69a55',accent2:'#f0bd79',bg:'#0a0a09',panel:'#15130f',panel2:'#1b1812',line:'#3b3021',text:'#f5f0e8',muted:'#9f9584',glow:'rgba(214,154,85,.22)'},
+ arctic:{name:'ARCTIC',accent:'#9edcf0',accent2:'#d9f5ff',bg:'#071015',panel:'#101b21',panel2:'#15232a',line:'#29434e',text:'#f2fbff',muted:'#91a9b4',glow:'rgba(158,220,240,.22)'}
+};
+function apply(id){const t=themes[id]||themes.ocean;document.documentElement.dataset.btmTheme=id||'ocean';const r=document.documentElement.style;r.setProperty('--theme-accent',t.accent);r.setProperty('--theme-accent-2',t.accent2);r.setProperty('--bg',t.bg);r.setProperty('--panel',t.panel);r.setProperty('--panel2',t.panel2);r.setProperty('--line',t.line);r.setProperty('--text',t.text);r.setProperty('--muted',t.muted);r.setProperty('--blue',t.accent);r.setProperty('--theme-glow',t.glow);const meta=document.getElementById('themeColorMeta');if(meta)meta.setAttribute('content',t.bg);localStorage.setItem(KEY,id);document.querySelectorAll('[data-btm-theme-choice]').forEach(b=>b.classList.toggle('selected',b.dataset.btmThemeChoice===id));}
+function build(){const anchor=document.getElementById('themeToggle');if(!anchor||document.getElementById('btmThemes'))return;const wrap=document.createElement('section');wrap.id='btmThemes';wrap.className='theme-section';wrap.innerHTML='<div class="theme-heading"><span>THEMES</span><span class="theme-caption">VISUAL IDENTITY</span></div><div class="theme-grid"></div>';const grid=wrap.querySelector('.theme-grid');Object.entries(themes).forEach(([id,t])=>{const b=document.createElement('button');b.type='button';b.className='theme-choice';b.dataset.btmThemeChoice=id;b.innerHTML='<span class="theme-swatch" style="--swatch:'+t.accent+';--swatch2:'+t.accent2+'"></span><span class="theme-name">'+t.name+'</span><span class="theme-check">✓</span>';b.onclick=()=>{apply(id);if(navigator.vibrate)try{navigator.vibrate(8)}catch{}};grid.appendChild(b)});anchor.insertAdjacentElement('afterend',wrap);apply(localStorage.getItem(KEY)||'ocean');}
+apply(localStorage.getItem(KEY)||'ocean');
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
+window.BTM_THEMES={apply, themes};
+})();
