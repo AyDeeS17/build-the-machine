@@ -1,0 +1,7 @@
+/* Unified Week styling: one blue system color, larger typography. */
+.week-card{border-color:var(--line)!important}
+.week-card.active{border-color:var(--blue)!important;box-shadow:0 0 0 1px rgba(102,185,223,.35),0 8px 28px rgba(0,0,0,.18)!important}
+.week-card.complete{background:linear-gradient(145deg,rgba(91,190,116,.16),#0a1713)!important;border-color:rgba(91,190,116,.55)!important}
+.week-number{font-size:17px!important;color:var(--blue)!important;letter-spacing:.02em}
+.week-rank{font-size:12px!important;color:var(--text)!important;letter-spacing:.04em}
+@media(max-width:380px){.week-number{font-size:16px!important}.week-rank{font-size:11px!important}}
