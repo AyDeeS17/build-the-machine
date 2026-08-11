@@ -1,4 +1,4 @@
-const CACHE='btm-training-v20';
+const CACHE='btm-training-v21';
 const CORE=['./','./index.html?v=20','./app.css?v=20','./week-style.css?v=20','./progress-style.css?v=20','./feature-style.css?v=20','./app.js?v=20','./progress.js?v=20','./feature-fix.js?v=20','./final-polish-final.js?v=20','./final-polish-ui.js?v=20','./simple-training-override.js?v=20','./hide-progress-achievements.js?v=20','./update-pwa.js?v=20','./manifest.webmanifest?v=20','../week-config.js?v=20','../training-config.js?v=20','../icon.svg?v=20','../apple-touch-icon-v2.png?v=20'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>Promise.allSettled(CORE.map(url=>fetch(url,{cache:'no-store'}).then(r=>{if(r.ok)return cache.put(url,r)}))).then(()=>self.skipWaiting())))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('btm-training-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
