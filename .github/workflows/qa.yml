@@ -12,6 +12,7 @@ jobs:
         run: |
           node --check app.js
           node --check app-shell.js
+          node --check training-config.js
           node --check ripple.js
           node --check running-polish.js
           node --check nav-reorder.js
@@ -26,6 +27,35 @@ jobs:
           grep -q "rank: 'NOVICE'" week-config.js
           grep -q "rank: 'LEGEND'" week-config.js
           grep -q "id: 7, rank: 'RECOVERY'.*isDeload: true" week-config.js
+      - name: Verify 12-week progressive overload model
+        run: |
+          node <<'NODE'
+          global.window={};
+          require('./training-config.js');
+          const p=window.BTM_TRAINING_WEEKS;
+          const weeks=Object.keys(p).map(Number).sort((a,b)=>a-b);
+          if(weeks.length!==12 || weeks.some((w,i)=>w!==i+1)) throw new Error('Training weeks must be exactly 1–12');
+          const totalSets=w=>p[w].days.reduce((n,d)=>n+d.exercises.reduce((m,e)=>m+e.sets,0),0);
+          const signatures=weeks.map(w=>JSON.stringify(p[w]));
+          if(new Set(signatures).size!==12) throw new Error('Duplicate full-week prescriptions detected');
+          if(!p[7].deload) throw new Error('Week 7 is not marked as deload');
+          if(totalSets(7)>=totalSets(6) || totalSets(7)>=totalSets(8)) throw new Error('Week 7 is not a true volume deload');
+          if(totalSets(8)<=totalSets(7)) throw new Error('Week 8 did not resume workload');
+          if(JSON.stringify(p[1])===JSON.stringify(p[12])) throw new Error('Week 12 is identical to Week 1');
+          for(const w of weeks){
+            for(const d of p[w].days){
+              for(const e of d.exercises){
+                if(!Number.isInteger(e.sets) || e.sets<2 || e.sets>4) throw new Error(`Invalid sets in Week ${w}, ${e.name}`);
+                if(e.rir<1 || e.rir>4) throw new Error(`Invalid RIR in Week ${w}, ${e.name}`);
+                if(!e.reps || !e.variation) throw new Error(`Incomplete prescription in Week ${w}, ${e.name}`);
+              }
+            }
+          }
+          const rirAvg=w=>{const a=[];p[w].days.forEach(d=>d.exercises.forEach(e=>a.push(e.rir)));return a.reduce((x,y)=>x+y,0)/a.length};
+          if(!(rirAvg(1)>rirAvg(6) && rirAvg(6)>rirAvg(7)===false)) throw new Error('RIR progression sanity check failed');
+          if(!(rirAvg(7)>rirAvg(8) && rirAvg(8)>rirAvg(12))) throw new Error('RIR does not recover after deload and progress toward peak');
+          console.log('Progression QA passed:', weeks.map(w=>`W${w}=${totalSets(w)} sets, avgRIR=${rirAvg(w).toFixed(2)}`).join(' | '));
+          NODE
       - name: Check navigation contract
         run: |
           grep -q 'id="trainingBtn"' index.html
