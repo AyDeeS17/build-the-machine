@@ -1,0 +1,1 @@
+(()=>{const hide=()=>{const x=document.getElementById('achievementList');if(x?.closest('.feature-panel'))x.closest('.feature-panel').style.display='none'};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(hide,100));else setTimeout(hide,100)})();
