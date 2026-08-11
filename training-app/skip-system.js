@@ -4,7 +4,6 @@ const SKIP_KEY='btm_training_skipped_days_v1',EX_KEY='btm_training_exercise_comp
 const read=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch{return d}};
 const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const WEEKS=window.BTM_WEEKS||[],PROGRAM=window.BTM_TRAINING_WEEKS||{};
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const exKey=(w,d,e)=>`w${w}:d${d}:e${e}`;
 const logKey=(w,d,e)=>`${w}|${d}|${e}`;
 const currentWeek=()=>Number(localStorage.getItem(WEEK_KEY))||1;
@@ -32,7 +31,7 @@ let note=dayEl.querySelector('.skip-adjustment');const misses=consecutiveMissesB
 function patchPrescription(card,w,d,e){const source=dayProgram(w,d)?.exercises?.[e];if(!source)return;const result=effectiveExercise(w,d,e,source);card.dataset.skipAdjusted=result.adjusted?'1':'0';if(!result.adjusted)return;const ex=result.exercise;const vals=card.querySelectorAll('.metric-value');if(vals[0])vals[0].textContent=`${ex.sets} × ${ex.reps}`;if(vals[1])vals[1].textContent=ex.rir;const grid=card.querySelector('.set-grid');if(grid&&grid.children.length!==ex.sets){const logs=read(LOG_KEY,{}),old=logs[logKey(w,d,e)]?.sets||[];grid.replaceChildren();for(let i=0;i<ex.sets;i++){const input=document.createElement('input');input.className='set-input';input.inputMode='decimal';input.placeholder='Set '+(i+1);input.value=old[i]||'';input.addEventListener('input',()=>{const next=read(LOG_KEY,{});const log=next[logKey(w,d,e)]||{done:false,feel:'',sets:[],note:''};log.sets[i]=input.value;next[logKey(w,d,e)]=log;write(LOG_KEY,next)});grid.appendChild(input)}}}
 function refreshWorkouts(){const w=currentWeek();document.querySelectorAll('#workouts>.day').forEach((day,d)=>{decorateDay(day,w,d);day.querySelectorAll('.exercise-card').forEach((card,e)=>patchPrescription(card,w,d,e))})}
 function refreshAll(){refreshWorkouts();addProgressSummary()}
-function boot(){ensureModal();refreshAll();const workouts=document.getElementById('workouts');if(workouts){let timer=0;new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(refreshWorkouts,25)}).observe(workouts,{childList:true,subtree:true})}const progress=document.getElementById('progressView');if(progress)new MutationObserver(()=>setTimeout(addProgressSummary,0)).observe(progress,{childList:true,subtree:true});document.getElementById('weekGrid')?.addEventListener('click',()=>setTimeout(refreshAll,50));setInterval(()=>{if(document.getElementById('workouts'))refreshAll()},1000)}
+function boot(){ensureModal();refreshAll();const workouts=document.getElementById('workouts');if(workouts){let timer=0;new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(refreshWorkouts,25)}).observe(workouts,{childList:true,subtree:true})}const progress=document.getElementById('progressView');if(progress)new MutationObserver(()=>setTimeout(addProgressSummary,0)).observe(progress,{childList:true,subtree:true)}document.getElementById('weekGrid')?.addEventListener('click',()=>setTimeout(refreshAll,50))}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,100));else setTimeout(boot,100);
 window.BTM_SKIP={isSkipped,skippedCount,refresh:refreshAll};
 })();
