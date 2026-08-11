@@ -1,5 +1,5 @@
-const CACHE='btm-training-v3';
-const CORE=['./','./index.html','./app.css','./week-style.css','./app.js','./manifest.webmanifest','../week-config.js','../training-config.js','../icon.svg'];
+const CACHE='btm-training-v4';
+const CORE=['./','./index.html','./app.css','./week-style.css','./progress-style.css','./app.js','./progress.js','./manifest.webmanifest','../week-config.js','../training-config.js','../icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{
@@ -9,10 +9,6 @@ self.addEventListener('fetch',event=>{
       const copy=response.clone();
       caches.open(CACHE).then(cache=>cache.put(event.request,copy));
       return response;
-    }).catch(()=>
-      caches.match(event.request).then(cached=>cached||(
-        event.request.mode==='navigate'?caches.match('./index.html'):Response.error()
-      ))
-    )
+    }).catch(()=>caches.match(event.request).then(cached=>cached||(event.request.mode==='navigate'?caches.match('./index.html'):Response.error())))
   );
 });
