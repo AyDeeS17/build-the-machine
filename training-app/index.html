@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#071016">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BUILD THE MACHINE">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<title>BUILD THE MACHINE</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app-shell">
+<header class="app-header">
+  <div class="eyebrow">BUILD THE MACHINE</div>
+  <div class="header-row"><h1>TRAINING</h1><button id="settingsBtn" class="icon-btn" aria-label="Training settings">•••</button></div>
+</header>
+<main id="app" aria-live="polite">
+  <section class="hero-card">
+    <div class="hero-top"><span class="eyebrow">CURRENT WEEK</span><span id="deloadBadge" class="badge hidden">DELOAD</span></div>
+    <div class="hero-week" id="currentWeek">WEEK 1</div>
+    <div class="hero-meta"><span id="currentRank">NOVICE</span><span id="overallProgress">0%</span></div>
+    <div class="progress-track"><i id="overallFill"></i></div>
+    <p id="rankQuote" class="quote"></p>
+  </section>
+
+  <section class="section-block">
+    <div class="section-title"><span>SELECT WEEK</span><span id="weekCount">0 / 12 COMPLETE</span></div>
+    <div id="weekGrid" class="week-grid"></div>
+  </section>
+
+  <section id="workoutSection" class="section-block workout-section">
+    <div class="section-title"><span id="selectedWeekLabel">WEEK 1</span><span id="selectedWeekStatus">IN PROGRESS</span></div>
+    <div id="workoutBanner" class="workout-banner"></div>
+    <div id="workouts"></div>
+  </section>
+</main>
+
+<div id="resetSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+  <div class="sheet">
+    <div class="sheet-grab"></div><h2 id="resetTitle">RESET WEEK</h2><p id="resetText">All training progress for this Week will be erased.</p>
+    <div class="sheet-actions"><button id="cancelReset" class="secondary">CANCEL</button><button id="confirmReset" class="danger">RESET</button></div>
+  </div>
+</div>
+<div id="settingsSheet" class="sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="sheet">
+    <div class="sheet-grab"></div><h2 id="settingsTitle">TRAINING DATA</h2><p>Progress is stored locally on this iPhone and remains available offline.</p>
+    <button id="resetCurrent" class="sheet-button">RESET CURRENT WEEK</button>
+    <button id="resetAll" class="sheet-button danger-outline">RESET ALL TRAINING DATA</button>
+    <button id="closeSettings" class="secondary full">CLOSE</button>
+  </div>
+</div>
+<script src="../week-config.js"></script>
+<script src="../training-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
