@@ -1,5 +1,5 @@
 (()=>{'use strict';
-const APP_VERSION='44';
+const APP_VERSION='48';
 const loadCalendar=()=>{if(document.getElementById('btmCalendarLive'))return;const s=document.createElement('script');s.id='btmCalendarLive';s.src=`./calendar-live.js?v=${APP_VERSION}`;document.body.appendChild(s)};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',loadCalendar,{once:true});else loadCalendar();
 if(!('serviceWorker'in navigator))return;
